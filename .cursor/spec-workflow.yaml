@@ -1,0 +1,24 @@
+master_doc: docs/brief.md
+task_board: docs/todo.md
+task_specs_dir: docs/tasks
+agents_entry: AGENTS.md
+audit_doc: docs/audit-gaps.md
+architecture_doc: docs/architecture.md
+testing_doc: docs/testing-strategy.md
+stack: generic
+task_id_format: "P0-{seq}"
+branch_prefix: feature
+default_branch: main
+max_pr_lines: 500
+spec_artifacts:
+  - path: docs/conventions.md
+    when: always
+  - path: docs/testing-strategy.md
+    when: always
+  - path: docs/design-system.md
+    when: ui
+  - path: docs/api-contracts.md
+    when: api
+task_file_routes:
+  - match: "^P0-"
+    file: phase-0.md
