@@ -1,9 +1,12 @@
-// Usage Pacer service worker (P0-1 scaffold).
-// No-op for now: alarm registration, cookie checks, fetch orchestration, and
-// icon/badge painting arrive in later phases (P0-3, P0-4, P0-6).
+// Usage Pacer service worker.
+// Alarm registration, fetch orchestration, and signed-out wiring land in P0-6.
+
+import { applyToolbar } from "../toolbar/apply";
+
+export { applyToolbar };
 
 chrome.runtime.onInstalled.addListener(() => {
-  // Intentionally empty. Wiring lands in P0-6.
+  // P0-6: alarm + initial fetch → applyToolbar
 });
 
 export {};
