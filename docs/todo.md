@@ -21,6 +21,7 @@ Master: [brief.md](brief.md) · Architecture: [architecture.md](architecture.md)
 - [x] Toolbar badge shows one decimal when the text is 4 characters or fewer
 - [x] Popup used pill and pace label show one decimal
 - [x] Popup model pool bars show one decimal
+- [x] Popup sync interval setting (5 min / 15 min / Manual)
 
 ## After MVP (not scheduled)
 

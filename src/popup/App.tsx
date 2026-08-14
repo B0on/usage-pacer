@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import type { BadgeMode } from "../domain/types";
+import {
+  DEFAULT_REFRESH_INTERVAL,
+  type BadgeMode,
+  type RefreshInterval,
+} from "../domain/types";
 import type { PopupState } from "../background/messages";
 import { sendBackgroundMessage } from "./messages";
 import { PopupView } from "./PopupView";
@@ -21,6 +25,7 @@ export function App() {
     signedOut: false,
     lastError: null,
     badgeMode: "remaining",
+    refreshInterval: DEFAULT_REFRESH_INTERVAL,
   });
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [hydrated, setHydrated] = useState(false);
@@ -88,18 +93,38 @@ export function App() {
     })();
   }, []);
 
+  const handleRefreshIntervalChange = useCallback((interval: RefreshInterval): void => {
+    void (async () => {
+      try {
+        const updated = await sendBackgroundMessage({
+          type: "setRefreshInterval",
+          interval,
+        });
+        setState(updated);
+        setNowMs(Date.now());
+      } catch {
+        setState((current) => ({
+          ...current,
+          lastError: current.lastError ?? "Could not update sync interval",
+        }));
+      }
+    })();
+  }, []);
+
   return (
     <PopupView
       snapshot={state.snapshot}
       signedOut={state.signedOut}
       lastError={state.lastError}
       badgeMode={state.badgeMode}
+      refreshInterval={state.refreshInterval}
       nowMs={nowMs}
       hydrated={hydrated}
       onRefresh={handleRefresh}
       onSignIn={() => openUrl(CURSOR_URL)}
       onOpenUsage={() => openUrl(USAGE_DASHBOARD_URL)}
       onBadgeModeChange={handleBadgeModeChange}
+      onRefreshIntervalChange={handleRefreshIntervalChange}
     />
   );
 }

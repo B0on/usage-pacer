@@ -234,14 +234,29 @@ body {
   color: var(--text-muted);
 }
 
-.pacer-badge-mode {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+.pacer-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-top: 18px;
 }
 
-.pacer-badge-mode__option {
+.pacer-setting__label {
+  margin: 0 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.pacer-segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.pacer-segmented__option {
   padding: 6px 4px;
   border: 1px solid var(--ring-track);
   border-radius: 8px;
@@ -253,12 +268,12 @@ body {
   cursor: pointer;
 }
 
-.pacer-badge-mode__option:hover {
+.pacer-segmented__option:hover {
   border-color: var(--text-dim);
   color: var(--text-on-pill);
 }
 
-.pacer-badge-mode__option--active {
+.pacer-segmented__option--active {
   border-color: var(--pill-elapsed);
   background: color-mix(in srgb, var(--pill-elapsed) 18%, transparent);
   color: var(--text-on-pill);

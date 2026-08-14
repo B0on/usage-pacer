@@ -27,6 +27,7 @@ Type: geometric sans, tabular numbers, bold on pills. No default system card gri
 3. **Meta** — plan name, `Resets on 18 Aug`, `N days left`, forecast sentence.
 4. **Bars** — **Cursor Models** (`autoPercentUsed`) and **Other Models** (`apiPercentUsed`) with one decimal (e.g. `76.0%`, `0.0%`). Other Models hint is plan-specific (Pro $20 / Pro+ $70 / Ultra $400).
 5. **Footer** — relative last-synced + Refresh. Sign-in CTA when cookie missing.
+6. **Settings** — Badge (Remaining / Delta / Used) and Sync (5 min / 15 min / Manual). Same segmented control.
 
 Popup width ~320px. Padding uneven on purpose (more below pills than above). Hover on Refresh only.
 

@@ -1,5 +1,5 @@
 import { computePacing } from "../domain/pacing";
-import type { BadgeMode, UsageSnapshot } from "../domain/types";
+import type { BadgeMode, RefreshInterval, UsageSnapshot } from "../domain/types";
 import {
   formatDaysLeft,
   formatForecastCopy,
@@ -12,10 +12,16 @@ import {
   paceColorClass,
 } from "./format";
 
-const BADGE_MODE_OPTIONS: { mode: BadgeMode; label: string }[] = [
-  { mode: "remaining", label: "Remaining" },
-  { mode: "delta", label: "Delta" },
-  { mode: "used", label: "Used" },
+const BADGE_MODE_OPTIONS: { value: BadgeMode; label: string }[] = [
+  { value: "remaining", label: "Remaining" },
+  { value: "delta", label: "Delta" },
+  { value: "used", label: "Used" },
+];
+
+const REFRESH_INTERVAL_OPTIONS: { value: RefreshInterval; label: string }[] = [
+  { value: "5min", label: "5 min" },
+  { value: "15min", label: "15 min" },
+  { value: "manual", label: "Manual" },
 ];
 
 export type PopupViewProps = {
@@ -23,11 +29,13 @@ export type PopupViewProps = {
   signedOut: boolean;
   lastError: string | null;
   badgeMode: BadgeMode;
+  refreshInterval: RefreshInterval;
   nowMs: number;
   onRefresh?: () => void;
   onSignIn?: () => void;
   onOpenUsage?: () => void;
   onBadgeModeChange?: (mode: BadgeMode) => void;
+  onRefreshIntervalChange?: (interval: RefreshInterval) => void;
   hydrated?: boolean;
 };
 
@@ -128,30 +136,37 @@ function UsageContent({
   );
 }
 
-function BadgeModeControl({
-  badgeMode,
-  onBadgeModeChange,
+function SegmentedControl<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
 }: {
-  badgeMode: BadgeMode;
-  onBadgeModeChange?: (mode: BadgeMode) => void;
+  label: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange?: (value: T) => void;
 }) {
   return (
-    <div className="pacer-badge-mode" role="group" aria-label="Badge display">
-      {BADGE_MODE_OPTIONS.map(({ mode, label }) => (
-        <button
-          key={mode}
-          type="button"
-          className={
-            mode === badgeMode
-              ? "pacer-badge-mode__option pacer-badge-mode__option--active"
-              : "pacer-badge-mode__option"
-          }
-          aria-pressed={mode === badgeMode}
-          onClick={() => onBadgeModeChange?.(mode)}
-        >
-          {label}
-        </button>
-      ))}
+    <div className="pacer-setting">
+      <p className="pacer-setting__label">{label}</p>
+      <div className="pacer-segmented" role="group" aria-label={label}>
+        {options.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className={
+              option.value === value
+                ? "pacer-segmented__option pacer-segmented__option--active"
+                : "pacer-segmented__option"
+            }
+            aria-pressed={option.value === value}
+            onClick={() => onChange?.(option.value)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -161,11 +176,13 @@ export function PopupView({
   signedOut,
   lastError,
   badgeMode,
+  refreshInterval,
   nowMs,
   onRefresh,
   onSignIn,
   onOpenUsage,
   onBadgeModeChange,
+  onRefreshIntervalChange,
   hydrated = true,
 }: PopupViewProps) {
   return (
@@ -187,7 +204,20 @@ export function PopupView({
         <p className="pacer-empty">No usage data yet. Refresh to fetch.</p>
       ) : null}
 
-      <BadgeModeControl badgeMode={badgeMode} onBadgeModeChange={onBadgeModeChange} />
+      <div className="pacer-settings">
+        <SegmentedControl
+          label="Badge"
+          value={badgeMode}
+          options={BADGE_MODE_OPTIONS}
+          onChange={onBadgeModeChange}
+        />
+        <SegmentedControl
+          label="Sync"
+          value={refreshInterval}
+          options={REFRESH_INTERVAL_OPTIONS}
+          onChange={onRefreshIntervalChange}
+        />
+      </div>
 
       <footer className="pacer-footer">
         {snapshot ? (

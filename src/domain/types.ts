@@ -28,6 +28,20 @@ export type UsageSnapshot = {
 
 export type BadgeMode = "remaining" | "delta" | "used";
 
+/** Background poll. Popup open and Refresh still sync in every mode. */
+export type RefreshInterval = "5min" | "15min" | "manual";
+
+export const DEFAULT_REFRESH_INTERVAL: RefreshInterval = "15min";
+
+const REFRESH_INTERVALS: RefreshInterval[] = ["5min", "15min", "manual"];
+
+export function isRefreshInterval(value: unknown): value is RefreshInterval {
+  return (
+    typeof value === "string" &&
+    REFRESH_INTERVALS.includes(value as RefreshInterval)
+  );
+}
+
 export type PaceColor = "green" | "yellow" | "red";
 
 export type DepletionForecast =

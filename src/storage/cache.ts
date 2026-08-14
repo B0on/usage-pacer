@@ -1,8 +1,15 @@
 import type { FetchResult } from "../cursor/client";
-import type { BadgeMode, UsageSnapshot } from "../domain/types";
+import {
+  DEFAULT_REFRESH_INTERVAL,
+  isRefreshInterval,
+  type BadgeMode,
+  type RefreshInterval,
+  type UsageSnapshot,
+} from "../domain/types";
 
 const SNAPSHOT_KEY = "snapshot";
 const BADGE_MODE_KEY = "badgeMode";
+const REFRESH_INTERVAL_KEY = "refreshInterval";
 const LAST_ERROR_KEY = "lastError";
 
 const DEFAULT_BADGE_MODE: BadgeMode = "remaining";
@@ -10,6 +17,7 @@ const DEFAULT_BADGE_MODE: BadgeMode = "remaining";
 export type CacheState = {
   snapshot: UsageSnapshot | null;
   badgeMode: BadgeMode;
+  refreshInterval: RefreshInterval;
   lastError: string | null;
 };
 
@@ -90,14 +98,22 @@ export async function getCache(
   storage: StorageArea = chrome.storage.local,
 ): Promise<CacheState> {
   const area = getStorage(storage);
-  const data = await area.get([SNAPSHOT_KEY, BADGE_MODE_KEY, LAST_ERROR_KEY]);
+  const data = await area.get([
+    SNAPSHOT_KEY,
+    BADGE_MODE_KEY,
+    REFRESH_INTERVAL_KEY,
+    LAST_ERROR_KEY,
+  ]);
 
   const snapshot = normalizeSnapshot(data[SNAPSHOT_KEY]);
   const badgeMode =
     (data[BADGE_MODE_KEY] as BadgeMode | undefined) ?? DEFAULT_BADGE_MODE;
+  const refreshInterval = isRefreshInterval(data[REFRESH_INTERVAL_KEY])
+    ? data[REFRESH_INTERVAL_KEY]
+    : DEFAULT_REFRESH_INTERVAL;
   const lastError = (data[LAST_ERROR_KEY] as string | null | undefined) ?? null;
 
-  return { snapshot, badgeMode, lastError };
+  return { snapshot, badgeMode, refreshInterval, lastError };
 }
 
 export async function getSnapshot(
@@ -126,6 +142,13 @@ export async function setBadgeMode(
   storage: StorageArea = chrome.storage.local,
 ): Promise<void> {
   await getStorage(storage).set({ [BADGE_MODE_KEY]: badgeMode });
+}
+
+export async function setRefreshInterval(
+  refreshInterval: RefreshInterval,
+  storage: StorageArea = chrome.storage.local,
+): Promise<void> {
+  await getStorage(storage).set({ [REFRESH_INTERVAL_KEY]: refreshInterval });
 }
 
 export async function getLastError(

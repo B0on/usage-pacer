@@ -4,17 +4,16 @@ import type { UsageSnapshot } from "../domain/types";
 import { PACE_GREY } from "../toolbar/badge";
 import { STALE_CACHE_MS } from "../toolbar/stale";
 import {
+  applyRefreshAlarm,
   handleBackgroundMessage,
   handleGetState,
   handleSetBadgeMode,
+  handleSetRefreshInterval,
   refreshAndApply,
-  registerRefreshAlarm,
+  syncRefreshAlarm,
   type BackgroundDeps,
 } from "./handlers";
-import {
-  REFRESH_ALARM_NAME,
-  REFRESH_ALARM_PERIOD_MINUTES,
-} from "./messages";
+import { REFRESH_ALARM_NAME } from "./messages";
 
 const CYCLE_START = "2026-07-18T10:36:57.000Z";
 const CYCLE_END = "2026-08-18T10:36:57.000Z";
@@ -67,6 +66,10 @@ function createDeps(
   const applyToolbar = vi.fn<BackgroundDeps["applyToolbar"]>().mockResolvedValue(undefined);
   const fetchUsageSummary = vi.fn<() => Promise<FetchResult>>();
   const nowMs = vi.fn(() => Date.parse("2026-08-14T12:00:00.000Z"));
+  const alarms = {
+    create: vi.fn().mockResolvedValue(undefined),
+    clear: vi.fn().mockResolvedValue(true),
+  };
 
   const {
     storageData: _storageData,
@@ -83,20 +86,49 @@ function createDeps(
     applyToolbar,
     nowMs,
     action: { setIcon, setBadgeText, setBadgeBackgroundColor },
+    alarms,
     ...rest,
   };
 }
 
-describe("registerRefreshAlarm", () => {
-  it("registers a 15-minute refresh alarm on install", () => {
-    const create = vi.fn().mockResolvedValue(undefined);
+describe("applyRefreshAlarm", () => {
+  it("creates a 15-minute alarm by default interval", async () => {
+    const alarms = {
+      create: vi.fn().mockResolvedValue(undefined),
+      clear: vi.fn().mockResolvedValue(true),
+    };
 
-    registerRefreshAlarm({ create });
+    await applyRefreshAlarm("15min", alarms);
 
-    expect(create).toHaveBeenCalledWith(REFRESH_ALARM_NAME, {
-      periodInMinutes: REFRESH_ALARM_PERIOD_MINUTES,
+    expect(alarms.create).toHaveBeenCalledWith(REFRESH_ALARM_NAME, {
+      periodInMinutes: 15,
     });
-    expect(REFRESH_ALARM_PERIOD_MINUTES).toBe(15);
+    expect(alarms.clear).not.toHaveBeenCalled();
+  });
+
+  it("creates a 5-minute alarm", async () => {
+    const alarms = {
+      create: vi.fn().mockResolvedValue(undefined),
+      clear: vi.fn().mockResolvedValue(true),
+    };
+
+    await applyRefreshAlarm("5min", alarms);
+
+    expect(alarms.create).toHaveBeenCalledWith(REFRESH_ALARM_NAME, {
+      periodInMinutes: 5,
+    });
+  });
+
+  it("clears the alarm for manual sync", async () => {
+    const alarms = {
+      create: vi.fn().mockResolvedValue(undefined),
+      clear: vi.fn().mockResolvedValue(true),
+    };
+
+    await applyRefreshAlarm("manual", alarms);
+
+    expect(alarms.clear).toHaveBeenCalledWith(REFRESH_ALARM_NAME);
+    expect(alarms.create).not.toHaveBeenCalled();
   });
 });
 
@@ -123,6 +155,7 @@ describe("background message handlers", () => {
     expect(state.signedOut).toBe(true);
     expect(state.snapshot).toBeNull();
     expect(state.badgeMode).toBe("remaining");
+    expect(state.refreshInterval).toBe("15min");
     expect(deps.fetchUsageSummary).not.toHaveBeenCalled();
   });
 
@@ -181,6 +214,42 @@ describe("background message handlers", () => {
       }),
       deps.action,
     );
+  });
+
+  it("setRefreshInterval persists interval, updates alarm, and does not fetch", async () => {
+    const snapshot = makeSnapshot();
+    const deps = createDeps({
+      signedOut: false,
+      storageData: {
+        snapshot,
+        badgeMode: "remaining",
+        refreshInterval: "15min",
+        lastError: null,
+      },
+    });
+
+    const state = await handleSetRefreshInterval("5min", deps);
+
+    expect(deps.fetchUsageSummary).not.toHaveBeenCalled();
+    expect(state.refreshInterval).toBe("5min");
+    expect(deps.alarms?.create).toHaveBeenCalledWith(REFRESH_ALARM_NAME, {
+      periodInMinutes: 5,
+    });
+
+    await handleSetRefreshInterval("manual", deps);
+    expect(deps.alarms?.clear).toHaveBeenCalledWith(REFRESH_ALARM_NAME);
+  });
+
+  it("syncRefreshAlarm reads the stored interval", async () => {
+    const deps = createDeps({
+      storageData: { refreshInterval: "5min" },
+    });
+
+    await syncRefreshAlarm(deps);
+
+    expect(deps.alarms?.create).toHaveBeenCalledWith(REFRESH_ALARM_NAME, {
+      periodInMinutes: 5,
+    });
   });
 
   it("missing cookie with stale cache paints ASCII dash via applyToolbar", async () => {
@@ -254,6 +323,12 @@ describe("background message handlers", () => {
       deps,
     );
     expect(modeState?.badgeMode).toBe("used");
+
+    const intervalState = await handleBackgroundMessage(
+      { type: "setRefreshInterval", interval: "manual" },
+      deps,
+    );
+    expect(intervalState?.refreshInterval).toBe("manual");
 
     const refreshState = await handleBackgroundMessage({ type: "refresh" }, deps);
     expect(refreshState?.snapshot?.fetchedAt).toBe(9_999);

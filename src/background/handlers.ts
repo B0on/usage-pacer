@@ -4,23 +4,27 @@ import {
   type CookieGetter,
   type FetchResult,
 } from "../cursor/client";
-import type { BadgeMode } from "../domain/types";
+import type { BadgeMode, RefreshInterval } from "../domain/types";
 import {
   applyFetchResult,
   getCache,
   setBadgeMode,
+  setRefreshInterval,
   type CacheState,
 } from "../storage/cache";
 import { applyToolbar, type ChromeActionApi } from "../toolbar/apply";
 import { hasUsableSnapshot } from "../toolbar/stale";
 import {
   isBadgeMode,
+  isRefreshInterval,
+  periodMinutesForInterval,
   REFRESH_ALARM_NAME,
-  REFRESH_ALARM_PERIOD_MINUTES,
   type PopupState,
 } from "./messages";
 
 type StorageArea = Parameters<typeof getCache>[0];
+
+export type ChromeAlarmsApi = Pick<typeof chrome.alarms, "create" | "clear">;
 
 export type BackgroundDeps = {
   storage: StorageArea;
@@ -29,6 +33,7 @@ export type BackgroundDeps = {
   applyToolbar: typeof applyToolbar;
   nowMs: () => number;
   action?: ChromeActionApi;
+  alarms?: ChromeAlarmsApi;
 };
 
 export async function detectSignedOut(
@@ -49,6 +54,7 @@ export function toPopupState(
     signedOut,
     lastError: cache.lastError,
     badgeMode: cache.badgeMode,
+    refreshInterval: cache.refreshInterval,
   };
 }
 
@@ -94,12 +100,35 @@ export async function handleSetBadgeMode(
   return toPopupState(cache, signedOut, deps.nowMs());
 }
 
-export function registerRefreshAlarm(
-  alarms: Pick<typeof chrome.alarms, "create">,
-): void {
-  void alarms.create(REFRESH_ALARM_NAME, {
-    periodInMinutes: REFRESH_ALARM_PERIOD_MINUTES,
-  });
+export async function applyRefreshAlarm(
+  interval: RefreshInterval,
+  alarms: ChromeAlarmsApi,
+): Promise<void> {
+  const periodInMinutes = periodMinutesForInterval(interval);
+  if (periodInMinutes === null) {
+    await alarms.clear(REFRESH_ALARM_NAME);
+    return;
+  }
+  await alarms.create(REFRESH_ALARM_NAME, { periodInMinutes });
+}
+
+export async function syncRefreshAlarm(deps: BackgroundDeps): Promise<void> {
+  if (!deps.alarms) {
+    return;
+  }
+  const cache = await getCache(deps.storage);
+  await applyRefreshAlarm(cache.refreshInterval, deps.alarms);
+}
+
+export async function handleSetRefreshInterval(
+  interval: RefreshInterval,
+  deps: BackgroundDeps,
+): Promise<PopupState> {
+  await setRefreshInterval(interval, deps.storage);
+  await syncRefreshAlarm(deps);
+  const cache = await getCache(deps.storage);
+  const signedOut = await detectSignedOut(deps.getCookie);
+  return toPopupState(cache, signedOut, deps.nowMs());
 }
 
 export async function handleBackgroundMessage(
@@ -120,6 +149,11 @@ export async function handleBackgroundMessage(
         return handleSetBadgeMode(message.mode, deps);
       }
       return undefined;
+    case "setRefreshInterval":
+      if ("interval" in message && isRefreshInterval(message.interval)) {
+        return handleSetRefreshInterval(message.interval, deps);
+      }
+      return undefined;
     default:
       return undefined;
   }
@@ -134,6 +168,7 @@ export function createDefaultDeps(
     fetchUsageSummary: () => fetchUsageSummary(),
     applyToolbar,
     nowMs: () => Date.now(),
+    alarms: chrome.alarms,
     ...overrides,
   };
 }

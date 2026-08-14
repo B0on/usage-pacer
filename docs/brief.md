@@ -258,7 +258,7 @@ If the user is not logged in, show a “Sign in at cursor.com” state. Do not s
 }
 ```
 
-Background alarm: refresh on a conservative interval (proposal: 15 minutes) plus on popup open.
+Background alarm: user setting **5 min** / **15 min** (default) / **Manual**. Popup open and the Refresh button always fetch.
 
 ## Privacy
 

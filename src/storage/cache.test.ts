@@ -39,6 +39,7 @@ describe("cache", () => {
     await expect(getCache(storage)).resolves.toEqual({
       snapshot: null,
       badgeMode: "remaining",
+      refreshInterval: "15min",
       lastError: null,
     });
   });
@@ -114,5 +115,22 @@ describe("cache", () => {
 
     expect(state.snapshot?.autoPercentUsed).toBe(0);
     expect(state.snapshot?.totalPercentUsed).toBe(snapshot.totalPercentUsed);
+  });
+
+  it("defaults refreshInterval to 15min and accepts stored values", async () => {
+    const empty = createMockStorage();
+    await expect(getCache(empty)).resolves.toMatchObject({
+      refreshInterval: "15min",
+    });
+
+    const stored = createMockStorage({ refreshInterval: "5min" });
+    await expect(getCache(stored)).resolves.toMatchObject({
+      refreshInterval: "5min",
+    });
+
+    const invalid = createMockStorage({ refreshInterval: "hourly" });
+    await expect(getCache(invalid)).resolves.toMatchObject({
+      refreshInterval: "15min",
+    });
   });
 });

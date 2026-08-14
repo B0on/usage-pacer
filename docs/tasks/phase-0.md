@@ -75,8 +75,8 @@ Spec refs for every task: [brief.md](../brief.md), [architecture.md](../architec
 - **Spec refs:** [architecture.md](../architecture.md) (Refresh, Error states, Cache)
 - **Files:** worker message API, popup settings control for badge mode, alarm registration on install
 - **Steps:**
-  1. `chrome.alarms` 15 minutes; on install + startup fetch.
-  2. Persist `badgeMode`; popup control A/B/C.
+  1. `chrome.alarms` from `refreshInterval` (5 / 15 / off); on install + startup fetch.
+  2. Persist `badgeMode` and `refreshInterval`; popup controls for both.
   3. Apply 24h stale rule consistently.
 - **Acceptance:** Changing mode updates badge without a new fetch. Alarm exists after install. Manual refresh updates `fetchedAt`. Signed-out + stale cache shows `—` and sign-in.
 - **Tests:** Stale vs fresh helpers. Message handler unit test with mocks. Manual: load unpacked, toggle mode, disable cookie, confirm `—` after 24h logic (inject old `fetchedAt` in storage).

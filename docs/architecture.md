@@ -69,14 +69,16 @@ Draw 16×16 and 32×32 `ImageData` via `OffscreenCanvas` in the worker. Fallback
 |-----|------|-------|
 | `snapshot` | `UsageSnapshot` | Last successful parse of `usage-summary` plus `fetchedAt` |
 | `badgeMode` | `"remaining" \| "delta" \| "used"` | Default `"remaining"` |
+| `refreshInterval` | `"5min" \| "15min" \| "manual"` | Default `"15min"`. Background alarm only. |
 | `lastError` | `string \| null` | Fetch/parse failure message for popup |
 
 `UsageSnapshot.fetchedAt` is epoch ms. Stale = signed out **and** `now - fetchedAt >= 24h` → badge `—`, empty ring. Signed out **and** cache younger than 24h → dim badge + ring from snapshot.
 
 ## Refresh
 
-- Alarm: every **15 minutes** (`chrome.alarms`).
-- Also: popup open, manual refresh button, extension install/startup.
+- Background alarm: **5 minutes**, **15 minutes** (default), or **manual** (no alarm). Setting is `refreshInterval` in storage.
+- Always: popup open, manual Refresh button, extension install/startup.
+- Changing the interval updates the alarm immediately and does not fetch.
 
 ## Error states
 

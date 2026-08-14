@@ -25,6 +25,7 @@ function renderFixture(overrides: Partial<Parameters<typeof PopupView>[0]> = {})
       signedOut={false}
       lastError={null}
       badgeMode="remaining"
+      refreshInterval="15min"
       nowMs={fixtureNowMs()}
       {...overrides}
     />,
@@ -74,6 +75,7 @@ describe("PopupView", () => {
         lastError={null}
         badgeMode="remaining"
         nowMs={fixtureNowMs()}
+        refreshInterval="15min"
       />,
     );
 
@@ -92,6 +94,7 @@ describe("PopupView", () => {
         lastError={null}
         badgeMode="remaining"
         nowMs={Date.now()}
+        refreshInterval="15min"
         hydrated={false}
       />,
     );
@@ -105,10 +108,23 @@ describe("PopupView", () => {
   it("renders badge mode control", () => {
     renderFixture();
 
-    expect(screen.getByRole("group", { name: "Badge display" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Badge" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Remaining" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Delta" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Used" })).toBeInTheDocument();
+  });
+
+  it("renders sync interval control", () => {
+    renderFixture();
+
+    expect(screen.getByRole("group", { name: "Sync" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "5 min" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "15 min" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Manual" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "15 min" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("does not show pills when signed out with stale cache", () => {
@@ -122,6 +138,7 @@ describe("PopupView", () => {
         lastError={null}
         badgeMode="remaining"
         nowMs={nowMs}
+        refreshInterval="manual"
       />,
     );
 
