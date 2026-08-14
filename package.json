@@ -3,7 +3,19 @@
   "version": "0.1.0",
   "description": "Chrome MV3 extension that paces Cursor usage against the billing-cycle reset date.",
   "private": true,
+  "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/B0on/usage-pacer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/B0on/usage-pacer/issues"
+  },
+  "homepage": "https://github.com/B0on/usage-pacer#readme",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

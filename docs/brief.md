@@ -4,6 +4,8 @@ Store name: **Usage Pacer**. Subtitle / description: **for Cursor**.
 Internal working name may still say Cursor Usage Pacer.  
 Status: requirements locked. Architecture and Phase 0 tasks: [architecture.md](architecture.md), [todo.md](todo.md).
 
+Not affiliated with, endorsed by, or sponsored by Anysphere, Inc. or Cursor. The Cursor web API used here is unofficial and can change without notice.
+
 ## Problem
 
 Cursor usage resets on a personal billing date (`Usage limits reset`), not on the 1st of the month. The dashboard shows how much of the included pool is used, but it does not show whether that pace will last until reset.

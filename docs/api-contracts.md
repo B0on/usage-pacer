@@ -1,5 +1,7 @@
 # API contracts — Cursor web (unofficial)
 
+Not affiliated with Anysphere or Cursor. These endpoints are reverse-engineered from the public dashboard and can change without notice.
+
 MVP uses **one** endpoint. Others in [brief.md](brief.md) are reference-only.
 
 Base: `https://cursor.com`. Auth: browser session cookie `WorkosCursorSessionToken` (httpOnly). Extension fetch from the service worker with `credentials: "include"` and host permission. Do not send `Authorization` headers. Do not persist the cookie.

@@ -1,6 +1,6 @@
 # Architecture — Usage Pacer
 
-Chrome extension (Manifest V3). No backend. All data stays on-device.
+Chrome extension (Manifest V3). No backend. All data stays on-device. Not affiliated with Anysphere or Cursor.
 
 Master product spec: [brief.md](brief.md). Fetch contract: [api-contracts.md](api-contracts.md). UI tokens: [design-system.md](design-system.md).
 

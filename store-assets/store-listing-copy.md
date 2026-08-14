@@ -24,4 +24,6 @@ English
 
 ## Privacy policy note
 
-The Chrome Web Store requires a publicly accessible privacy policy URL because the extension checks the existing cursor.com session. Host `privacy-policy.md` at a public URL before submitting the item for review.
+The Chrome Web Store requires a publicly accessible privacy policy URL because the extension checks the existing cursor.com session. Use:
+
+https://github.com/B0on/usage-pacer/blob/main/PRIVACY.md

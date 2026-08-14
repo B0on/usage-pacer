@@ -24,6 +24,7 @@ Master: [brief.md](brief.md) · Architecture: [architecture.md](architecture.md)
 - [x] One-decimal percents in toolbar badge (4-character cap) and popup
 - [x] Popup sync interval setting (5 min / 15 min / Manual)
 - [x] Store listing copy and assets (`store-assets/`)
+- [x] Public GitHub hygiene (MIT license, README, CI, privacy policy)
 
 ## Later
 

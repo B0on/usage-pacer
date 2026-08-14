@@ -20,6 +20,7 @@ Usage Pacer — Chrome MV3 extension. Product: [docs/brief.md](docs/brief.md).
 | [docs/testing-strategy.md](docs/testing-strategy.md) | Vitest + manual |
 | [docs/audit-gaps.md](docs/audit-gaps.md) | Known risks |
 | [store-assets/](store-assets/) | Chrome Web Store copy and images |
+| [PRIVACY.md](PRIVACY.md) | Privacy policy (public URL for the store listing) |
 
 ## Guardrails
 

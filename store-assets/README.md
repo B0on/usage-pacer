@@ -16,4 +16,4 @@
 - `promo-small.html` — source for the small promotional tile.
 - `promo-marquee.html` — source for the marquee promotional tile.
 - `store-listing-copy.md` — English listing copy.
-- `privacy-policy.md` — privacy policy draft to publish at a public URL.
+- `privacy-policy.md` — pointer to the public [PRIVACY.md](../PRIVACY.md).
