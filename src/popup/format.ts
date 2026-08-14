@@ -1,12 +1,12 @@
-import { formatResetDateLocal } from "../domain/pacing";
+import { formatResetDateLocal, roundToOneDecimal } from "../domain/pacing";
 import { MS_PER_DAY, type DepletionForecast, type PacingViewModel } from "../domain/types";
 
-/** Whole-number % to match Cursor dashboard model pool bars. */
+/** One decimal, including `.0`. Detail over dashboard-matching integers. */
 export function formatModelPoolPercent(percentUsed: number): string {
   if (!Number.isFinite(percentUsed)) {
-    return "0%";
+    return "0.0%";
   }
-  return `${Math.round(percentUsed)}%`;
+  return `${roundToOneDecimal(percentUsed).toFixed(1)}%`;
 }
 
 function normalizeMembershipKey(membershipType: string): string {
@@ -62,12 +62,13 @@ export function capitalizeMembershipType(membershipType: string): string {
   return membershipType.charAt(0).toUpperCase() + membershipType.slice(1);
 }
 
-export function formatPaceLabel(badgeDelta: number): string {
-  if (badgeDelta < 0) {
-    return `Behind −${Math.abs(badgeDelta)}pt`;
+export function formatPaceLabel(deltaPct: number): string {
+  const delta = roundToOneDecimal(deltaPct);
+  if (delta < 0) {
+    return `Behind −${Math.abs(delta).toFixed(1)}pt`;
   }
-  if (badgeDelta > 0) {
-    return `Ahead +${badgeDelta}pt`;
+  if (delta > 0) {
+    return `Ahead +${delta.toFixed(1)}pt`;
   }
   return "On pace";
 }

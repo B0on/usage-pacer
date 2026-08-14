@@ -87,7 +87,7 @@ Chrome allows **one** badge string (about 2–4 characters) on the extension ico
 | Channel | What it shows | Screenshot mapping |
 |---------|----------------|--------------------|
 | **Icon (always)** | Ring filled to `averagePct` (elapsed time → 100% at reset) | Right pill `92.4` — “how far through the cycle” |
-| **Badge (toggle)** | One number + pace color | Left pill `66%` or its inverse remaining |
+| **Badge (toggle)** | One number + pace color | Left pill `66.1%` or its inverse remaining |
 
 Near reset, the ring is almost a full circle. That is the “subscription is about to renew, spend what’s left” cue — without needing a second badge.
 
@@ -102,11 +102,13 @@ Draw at 16×16 and 32×32 via `chrome.action.setIcon` (OffscreenCanvas in the se
 
 ### Badge text
 
-| Mode | Text | Example at used 66% / elapsed 92.4% |
-|------|------|--------------------------------------|
-| **A (default)** | Remaining % | `34` |
-| **B** | Pace delta | `-26` (behind = healthy) |
-| **C** | Used % (`totalPercentUsed`) | `66` — matches the left Cycle Counter pill |
+Chrome’s overlay is readable at **4 characters** and may truncate at 5. Format with **one decimal** (including `.0`) when that string is 4 characters or fewer; otherwise drop to an integer.
+
+| Mode | Text | Example at used 66.107% / elapsed 92.4% |
+|------|------|------------------------------------------|
+| **A (default)** | Remaining % | `33.9` (`100.0` would be 5 characters → `100`) |
+| **B** | Pace delta | `-26` (`-26.3` is 5 characters). Behind = healthy. `+9.0` / `-9.4` still fit |
+| **C** | Used % (`totalPercentUsed`) | `66.1` |
 
 Color is **pace only**. Remaining % being low at the end of a well-paced cycle must not force red.
 
@@ -122,12 +124,12 @@ Escalate **one step** if the depletion forecast empties **before** `cycleEnd` (a
 - Yellow → red
 - Red stays red
 
-Worked example (the screenshot): used **66%**, elapsed **92.4%**, `delta = -26.4`.
+Worked example (the screenshot): used **66.107%**, elapsed **92.4%**, `delta = -26.3`.
 
 - Icon ring ≈ 92% closed (reset soon).
-- Mode A: green `34` — 34% quota left, month almost over → spend.
-- Mode B: green `-26`.
-- Mode C: green `66`.
+- Mode A: green `33.9` — ~34% quota left, month almost over → spend.
+- Mode B: green `-26` (one decimal would be 5 characters).
+- Mode C: green `66.1`.
 
 On-demand does not change the number: remaining stays `0` (never negative, never `+12` overage on the badge).
 
@@ -140,12 +142,12 @@ Signed-out / stale:
 
 UI copy is **English**.
 
-1. **Header pills (Cycle Counter layout):** left = **Elapsed** (linear average time through the cycle, e.g. `92.4%`), right = **Used** (`totalPercentUsed`, e.g. `66%`). Same 0–100 scale. Each pill has a short caption so the two numbers are not unlabeled. Used < Elapsed → surplus (spend before reset). Used > Elapsed → ahead (slow down).
+1. **Header pills (Cycle Counter layout):** left = **Elapsed** (linear average time through the cycle, e.g. `92.4%`), right = **Used** (`totalPercentUsed`, e.g. `66.1%`). Same 0–100 scale. Each pill has a short caption so the two numbers are not unlabeled. Used < Elapsed → surplus (spend before reset). Used > Elapsed → ahead (slow down).
 2. Plan label (`membershipType`), reset date in local time (“Resets on 18 Aug”).
 3. **Pace row:** `Ahead +4.5pt` / `Behind −4.5pt` (numeric delta; the pills already show the two %).
 4. **Days left** until reset (from fractional `daysLeft`, displayed as a whole number of days).
 5. **Forecast:** “At this pace, empty on DATE (N days before reset)” or “At this pace, lasts through reset”.
-6. **Breakdown:** **Cursor Models** and **Other Models** usage bars (`autoPercentUsed` / `apiPercentUsed`), aligned with the Cursor dashboard “Included in {plan}” section. Other Models footnote uses the plan’s included API floor (Pro $20, Pro+ $70, Ultra $400).
+6. **Breakdown:** **Cursor Models** and **Other Models** usage bars (`autoPercentUsed` / `apiPercentUsed`), one decimal like the pills (e.g. `76.0%` / `0.0%`). Other Models footnote uses the plan’s included API floor (Pro $20, Pro+ $70, Ultra $400).
 7. **On-demand:** if `onDemand.enabled`, footnote “On-demand ON” and `onDemand.used` when `used > 0`. Remaining % still clamps at 0.
 8. Footer: last synced time + manual refresh. If not signed in to `cursor.com`, prompt to open Cursor login. Grey `—` (or dim last-known) on the badge as above.
 

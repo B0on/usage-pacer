@@ -39,8 +39,8 @@ describe("PopupView", () => {
     expect(within(pills).getByText("Elapsed")).toBeInTheDocument();
     expect(within(pills).getByText("Used")).toBeInTheDocument();
     expect(within(pills).getByText("92.4%")).toBeInTheDocument();
-    expect(within(pills).getByText("66%")).toBeInTheDocument();
-    expect(screen.getByText("Behind −26pt")).toBeInTheDocument();
+    expect(within(pills).getByText("66.1%")).toBeInTheDocument();
+    expect(screen.getByText("Behind −26.3pt")).toBeInTheDocument();
     expect(
       screen.getByText("At this pace, lasts through reset"),
     ).toBeInTheDocument();
@@ -52,8 +52,8 @@ describe("PopupView", () => {
     expect(screen.getByText("Included in Pro")).toBeInTheDocument();
     expect(screen.getByText("Cursor Models")).toBeInTheDocument();
     expect(screen.getByText("Other Models")).toBeInTheDocument();
-    expect(screen.getByText("76%")).toBeInTheDocument();
-    expect(screen.getByText("0%")).toBeInTheDocument();
+    expect(screen.getByText("76.0%")).toBeInTheDocument();
+    expect(screen.getByText("0.0%")).toBeInTheDocument();
     expect(
       screen.getByText("Includes Cursor Grok and Composer"),
     ).toBeInTheDocument();
@@ -125,7 +125,7 @@ describe("PopupView", () => {
       />,
     );
 
-    expect(screen.queryByText("66%")).not.toBeInTheDocument();
+    expect(screen.queryByText("66.1%")).not.toBeInTheDocument();
     expect(screen.queryByText("92.4%")).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Open Cursor" }),

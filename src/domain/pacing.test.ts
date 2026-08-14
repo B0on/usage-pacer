@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   computePacing,
+  formatBadgeNumber,
   formatBadgeText,
   formatResetDateLocal,
   getBasePaceColor,
@@ -87,7 +88,7 @@ describe("computePacing", () => {
     expect(vm.paceColor).toBe("green");
     expect(vm.forecast.status).toBe("lasts_through_reset");
     expect(vm.elapsedPillDisplay).toBe("92.4");
-    expect(vm.usedPillDisplay).toBe("66%");
+    expect(vm.usedPillDisplay).toBe("66.1%");
   });
 
   it("100% used with days left empties early", () => {
@@ -179,6 +180,43 @@ describe("computePacing", () => {
   });
 });
 
+describe("formatBadgeNumber", () => {
+  it.each([
+    { value: 0, expected: "0.0" },
+    { value: 9, expected: "9.0" },
+    { value: 34, expected: "34.0" },
+    { value: 33.893, expected: "33.9" },
+    { value: 66.107, expected: "66.1" },
+    { value: 99.9, expected: "99.9" },
+    { value: 100, expected: "100" },
+    { value: 110.4, expected: "110" },
+  ])("unsigned $value → $expected", ({ value, expected }) => {
+    expect(formatBadgeNumber(value)).toBe(expected);
+  });
+
+  it.each([
+    { value: 0, expected: "0.0" },
+    { value: 9, expected: "+9.0" },
+    { value: 9.4, expected: "+9.4" },
+    { value: 10, expected: "+10" },
+    { value: -9, expected: "-9.0" },
+    { value: -9.4, expected: "-9.4" },
+    { value: 26.4, expected: "+26" },
+    { value: -26.293, expected: "-26" },
+    { value: 30, expected: "+30" },
+  ])("signed $value → $expected", ({ value, expected }) => {
+    expect(formatBadgeNumber(value, { signed: true })).toBe(expected);
+  });
+
+  it("stays within Chrome's 4-character badge budget", () => {
+    const samples = [0, 9, 10, 34, 99.9, 100, 110.4, -9.4, -10, -26.3, 9.4, 30];
+    for (const value of samples) {
+      expect(formatBadgeNumber(value).length).toBeLessThanOrEqual(4);
+      expect(formatBadgeNumber(value, { signed: true }).length).toBeLessThanOrEqual(4);
+    }
+  });
+});
+
 describe("formatBadgeText", () => {
   it("formats remaining, delta, and used modes", () => {
     const vm = computePacing(
@@ -186,9 +224,9 @@ describe("formatBadgeText", () => {
       nowAtElapsedFraction(0.924),
     );
 
-    expect(formatBadgeText(vm, "remaining")).toBe("34");
+    expect(formatBadgeText(vm, "remaining")).toBe("33.9");
     expect(formatBadgeText(vm, "delta")).toBe("-26");
-    expect(formatBadgeText(vm, "used")).toBe("66");
+    expect(formatBadgeText(vm, "used")).toBe("66.1");
   });
 
   it("formats positive delta with a plus sign", () => {
@@ -198,7 +236,7 @@ describe("formatBadgeText", () => {
     );
 
     expect(vm.badgeDelta).toBeGreaterThan(0);
-    expect(formatBadgeText(vm, "delta")).toMatch(/^\+/);
+    expect(formatBadgeText(vm, "delta")).toBe("+30");
   });
 });
 

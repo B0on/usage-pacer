@@ -22,14 +22,14 @@ Type: geometric sans, tabular numbers, bold on pills. No default system card gri
 
 ## Components
 
-1. **Pills row** — two labeled rounded rects. Left: **Elapsed** (`92.4%`, one decimal). Right: **Used** (`66%`). Same 0–100 scale. Caption sits above the number inside each pill.
-2. **Pace label** — `Behind −26pt` / `Ahead +8pt` under the pills.
+1. **Pills row** — two labeled rounded rects. Left: **Elapsed** (`92.4%`, one decimal). Right: **Used** (`66.1%`, one decimal). Same 0–100 scale. Caption sits above the number inside each pill.
+2. **Pace label** — `Behind −26.3pt` / `Ahead +8.0pt` under the pills (one decimal, including `.0`).
 3. **Meta** — plan name, `Resets on 18 Aug`, `N days left`, forecast sentence.
-4. **Bars** — **Cursor Models** (`autoPercentUsed`) and **Other Models** (`apiPercentUsed`), matching the Cursor “Included in {plan}” dashboard. Other Models hint is plan-specific (Pro $20 / Pro+ $70 / Ultra $400).
+4. **Bars** — **Cursor Models** (`autoPercentUsed`) and **Other Models** (`apiPercentUsed`) with one decimal (e.g. `76.0%`, `0.0%`). Other Models hint is plan-specific (Pro $20 / Pro+ $70 / Ultra $400).
 5. **Footer** — relative last-synced + Refresh. Sign-in CTA when cookie missing.
 
 Popup width ~320px. Padding uneven on purpose (more below pills than above). Hover on Refresh only.
 
 ## Toolbar
 
-Icon is the elapsed ring (see [architecture.md](architecture.md)). Badge is Chrome’s native overlay; we only set text + background color tokens above.
+Icon is the elapsed ring (see [architecture.md](architecture.md)). Badge is Chrome’s native overlay; we only set text + background color tokens above. Badge text uses one decimal (including `.0`) when the string is 4 characters or fewer.

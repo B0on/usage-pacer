@@ -23,7 +23,7 @@ function roundToInteger(value: number): number {
   return Math.round(value);
 }
 
-function roundToOneDecimal(value: number): number {
+export function roundToOneDecimal(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
@@ -91,19 +91,41 @@ export function formatResetDateLocal(
   }).format(new Date(cycleEndIso));
 }
 
+/** Chrome toolbar badges stay readable at 4 characters; 5+ may truncate. */
+export const MAX_BADGE_TEXT_LENGTH = 4;
+
+function withLeadingPlus(text: string, signed: boolean, value: number): string {
+  return signed && value > 0 ? `+${text}` : text;
+}
+
+/** One decimal when the string fits in 4 characters, including `.0`. */
+export function formatBadgeNumber(
+  value: number,
+  options: { signed?: boolean } = {},
+): string {
+  const signed = options.signed === true;
+  const rounded = roundToOneDecimal(value);
+  const withDecimal = withLeadingPlus(rounded.toFixed(1), signed, rounded);
+  if (withDecimal.length <= MAX_BADGE_TEXT_LENGTH) {
+    return withDecimal;
+  }
+
+  const asInteger = roundToInteger(value);
+  return withLeadingPlus(String(asInteger), signed, asInteger);
+}
+
+/** Toolbar overlay only. Uses raw percents, not integer `badgeRemaining` / `badgeUsed`. */
 export function formatBadgeText(
   viewModel: PacingViewModel,
   mode: BadgeMode,
 ): string {
   switch (mode) {
     case "remaining":
-      return String(viewModel.badgeRemaining);
-    case "delta": {
-      const delta = viewModel.badgeDelta;
-      return delta > 0 ? `+${delta}` : String(delta);
-    }
+      return formatBadgeNumber(viewModel.remainingPct);
+    case "delta":
+      return formatBadgeNumber(viewModel.deltaPct, { signed: true });
     case "used":
-      return String(viewModel.badgeUsed);
+      return formatBadgeNumber(viewModel.actualUsedPct);
   }
 }
 
@@ -148,7 +170,7 @@ export function computePacing(
     deltaPct,
     daysLeft,
     elapsedPillDisplay: elapsedRounded.toFixed(1),
-    usedPillDisplay: `${badgeUsed}%`,
+    usedPillDisplay: `${roundToOneDecimal(actualUsedPct).toFixed(1)}%`,
     badgeRemaining,
     badgeDelta,
     badgeUsed,

@@ -9,7 +9,7 @@ Master product spec: [brief.md](brief.md). Fetch contract: [api-contracts.md](ap
 The extension reads the user’s existing `cursor.com` web session, pulls the current billing-cycle usage, computes a linear pace, and shows:
 
 - Toolbar **icon**: elapsed-time ring (`averagePct` → 100% at reset)
-- Toolbar **badge**: one number (remaining / delta / used) + pace color
+- Toolbar **badge**: one number (remaining / delta / used) + pace color. One decimal when the text fits in 4 characters; integer otherwise.
 - **Popup**: Cycle Counter-style two pills (used % vs elapsed %) plus forecast
 
 It does not scrape the Cursor desktop app.

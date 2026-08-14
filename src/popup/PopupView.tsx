@@ -87,7 +87,7 @@ function UsageContent({
       </div>
 
       <p className={`pacer-pace ${paceColorClass(pacing.paceColor)}`}>
-        {formatPaceLabel(pacing.badgeDelta)}
+        {formatPaceLabel(pacing.deltaPct)}
       </p>
 
       <div className="pacer-meta">

@@ -25,8 +25,8 @@ Spec refs for every task: [brief.md](../brief.md), [architecture.md](../architec
 - **Steps:**
   1. Types: snapshot fields needed for math (`billingCycleStart/End`, `totalPercentUsed`, `onDemand`, `breakdown`, `apiPercentUsed`, `membershipType`, `fetchedAt`).
   2. Implement fractional-day math, `remainingPct` clamp, `deltaPct`, forecast, badge text for modes A/B/C, pace color + one-step escalate.
-  3. Round badge remaining/used to integers; delta to integer; elapsed pill to one decimal.
-- **Acceptance:** Screenshot case used 66.107, elapsed 92.4 → remaining 34, delta negative, color green, forecast lasts through reset. `remainingPct` never negative. Escalate does not use remaining% as a color input.
+  3. Badge text: one decimal (including `.0`) when the string is 4 characters or fewer; otherwise integer. Elapsed pill is always one decimal.
+- **Acceptance:** Screenshot case used 66.107, elapsed 92.4 → remaining 34, used pill `66.1%`, delta negative, color green, forecast lasts through reset. `remainingPct` never negative. Escalate does not use remaining% as a color input.
 - **Tests:** Vitest table cases: start/end of cycle, mid, 66 vs 92.4, 100% used, zero elapsed, forecast before/after reset, color bands, escalate.
 
 ### P0-3 — Fetch usage-summary + cache
@@ -52,7 +52,7 @@ Spec refs for every task: [brief.md](../brief.md), [architecture.md](../architec
   1. Draw 16 and 32 rings from `averagePct`; empty track for signed-out/stale.
   2. Badge text for remaining / delta / used; colors green/yellow/red/grey.
   3. Dim grey badge when signed out with fresh cache.
-- **Acceptance:** At elapsed ~92% the ring is nearly closed. Mode A `34`, B `-26`, C `66` for the screenshot fixture. Stale signed-out → `—`. Ring fill is product green, not pace red.
+- **Acceptance:** At elapsed ~92% the ring is nearly closed. Mode A `33.9`, B `-26`, C `66.1` for the screenshot fixture. Stale signed-out → `—`. Ring fill is product green, not pace red.
 - **Tests:** Badge string helpers (pure). Icon function returns ImageData with non-zero alpha (if canvas available in Vitest; otherwise extract arc-angle helper and unit-test that).
 
 ### P0-5 — Popup two-pills UI
@@ -65,7 +65,7 @@ Spec refs for every task: [brief.md](../brief.md), [architecture.md](../architec
   1. Left pill used %, right pill elapsed (one decimal). Pace label, reset date (local), days left, forecast copy, Included/Bonus bars, API bar if needed, on-demand footnote, footer + Refresh.
   2. Signed-out CTA opens `https://cursor.com`.
   3. English copy only.
-- **Acceptance:** Fixture render shows 66% vs 92.4, behind-pace label, no template card grid. API bar hidden when `apiPercentUsed === 0`.
+- **Acceptance:** Fixture render shows 66.1% vs 92.4, behind-pace label with one decimal, no template card grid. API bar hidden when `apiPercentUsed === 0`.
 - **Tests:** Render popup with fixture (Vitest + React Testing Library): pills text, forecast, sign-in state.
 
 ### P0-6 — Alarm, settings, signed-out wiring

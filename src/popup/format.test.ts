@@ -3,6 +3,7 @@ import {
   formatIncludedHeading,
   formatModelPoolPercent,
   formatOtherModelsHint,
+  formatPaceLabel,
   formatPlanLabel,
 } from "./format";
 
@@ -23,10 +24,24 @@ describe("plan copy", () => {
   });
 });
 
+describe("formatPaceLabel", () => {
+  it.each([
+    { delta: -26.293, expected: "Behind −26.3pt" },
+    { delta: 8, expected: "Ahead +8.0pt" },
+    { delta: 0, expected: "On pace" },
+    { delta: 0.04, expected: "On pace" },
+    { delta: -0.06, expected: "Behind −0.1pt" },
+  ])("$delta → $expected", ({ delta, expected }) => {
+    expect(formatPaceLabel(delta)).toBe(expected);
+  });
+});
+
 describe("formatModelPoolPercent", () => {
-  it("rounds finite percents and treats invalid values as 0%", () => {
-    expect(formatModelPoolPercent(76.023)).toBe("76%");
-    expect(formatModelPoolPercent(Number.NaN)).toBe("0%");
-    expect(formatModelPoolPercent(Number.POSITIVE_INFINITY)).toBe("0%");
+  it("rounds finite percents to one decimal and treats invalid values as 0.0%", () => {
+    expect(formatModelPoolPercent(76.023)).toBe("76.0%");
+    expect(formatModelPoolPercent(76.05)).toBe("76.1%");
+    expect(formatModelPoolPercent(0)).toBe("0.0%");
+    expect(formatModelPoolPercent(Number.NaN)).toBe("0.0%");
+    expect(formatModelPoolPercent(Number.POSITIVE_INFINITY)).toBe("0.0%");
   });
 });

@@ -18,9 +18,12 @@ Master: [brief.md](brief.md) · Architecture: [architecture.md](architecture.md)
 - [x] **P0-5** Popup two-pills UI _deps: P0-2, P0-3_
 - [x] **P0-6** Alarm, settings, signed-out wiring _deps: P0-4, P0-5_
 - [x] Popup pool bars + pill labels + hardening (plan copy, 401, alarm, cache)
+- [x] Toolbar badge shows one decimal when the text is 4 characters or fewer
+- [x] Popup used pill and pace label show one decimal
+- [x] Popup model pool bars show one decimal
 
 ## After MVP (not scheduled)
 
-- [ ] Store listing copy
+- [x] Store listing copy
 - [ ] Daily history chart
 - [ ] Threshold notifications

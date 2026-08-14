@@ -161,9 +161,9 @@ describe("resolveBadgePresentation", () => {
   const vm = screenshotFixtureVm();
 
   it.each([
-    { mode: "remaining" as const, text: "34" },
+    { mode: "remaining" as const, text: "33.9" },
     { mode: "delta" as const, text: "-26" },
-    { mode: "used" as const, text: "66" },
+    { mode: "used" as const, text: "66.1" },
   ])("screenshot fixture mode $mode → $text", ({ mode, text }) => {
     const badge = resolveBadgePresentation({
       viewModel: vm,
@@ -193,7 +193,7 @@ describe("resolveBadgePresentation", () => {
       stale: false,
       badgeMode: "remaining",
     });
-    expect(badge.text).toBe("34");
+    expect(badge.text).toBe("33.9");
     expect(badge.backgroundColor).toBe(PACE_GREY);
   });
 
@@ -239,7 +239,7 @@ describe("applyToolbar", () => {
       action,
     );
 
-    expect(setBadgeText).toHaveBeenCalledWith({ text: "34" });
+    expect(setBadgeText).toHaveBeenCalledWith({ text: "33.9" });
     expect(setBadgeBackgroundColor).toHaveBeenCalledWith({
       color: PACE_BADGE_COLORS.green,
     });
@@ -323,6 +323,6 @@ describe("applyToolbar", () => {
       action,
     );
 
-    expect(setBadgeText).toHaveBeenCalledWith({ text: "34" });
+    expect(setBadgeText).toHaveBeenCalledWith({ text: "33.9" });
   });
 });
