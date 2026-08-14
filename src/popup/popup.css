@@ -202,12 +202,42 @@ body {
   color: var(--text-muted);
 }
 
+.pacer-badge-mode {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.pacer-badge-mode__option {
+  padding: 6px 4px;
+  border: 1px solid var(--ring-track);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.pacer-badge-mode__option:hover {
+  border-color: var(--text-dim);
+  color: var(--text-on-pill);
+}
+
+.pacer-badge-mode__option--active {
+  border-color: var(--pill-elapsed);
+  background: color-mix(in srgb, var(--pill-elapsed) 18%, transparent);
+  color: var(--text-on-pill);
+}
+
 .pacer-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--ring-track);
 }

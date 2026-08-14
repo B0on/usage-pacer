@@ -1,5 +1,5 @@
 import { computePacing } from "../domain/pacing";
-import type { UsageSnapshot } from "../domain/types";
+import type { BadgeMode, UsageSnapshot } from "../domain/types";
 import {
   capitalizeMembershipType,
   formatDaysLeft,
@@ -9,13 +9,21 @@ import {
   paceColorClass,
 } from "./format";
 
+const BADGE_MODE_OPTIONS: { mode: BadgeMode; label: string }[] = [
+  { mode: "remaining", label: "Remaining" },
+  { mode: "delta", label: "Delta" },
+  { mode: "used", label: "Used" },
+];
+
 export type PopupViewProps = {
   snapshot: UsageSnapshot | null;
   signedOut: boolean;
   lastError: string | null;
+  badgeMode: BadgeMode;
   nowMs: number;
   onRefresh?: () => void;
   onSignIn?: () => void;
+  onBadgeModeChange?: (mode: BadgeMode) => void;
 };
 
 function BreakdownBar({
@@ -110,13 +118,43 @@ function UsageContent({
   );
 }
 
+function BadgeModeControl({
+  badgeMode,
+  onBadgeModeChange,
+}: {
+  badgeMode: BadgeMode;
+  onBadgeModeChange?: (mode: BadgeMode) => void;
+}) {
+  return (
+    <div className="pacer-badge-mode" role="group" aria-label="Badge display">
+      {BADGE_MODE_OPTIONS.map(({ mode, label }) => (
+        <button
+          key={mode}
+          type="button"
+          className={
+            mode === badgeMode
+              ? "pacer-badge-mode__option pacer-badge-mode__option--active"
+              : "pacer-badge-mode__option"
+          }
+          aria-pressed={mode === badgeMode}
+          onClick={() => onBadgeModeChange?.(mode)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function PopupView({
   snapshot,
   signedOut,
   lastError,
+  badgeMode,
   nowMs,
   onRefresh,
   onSignIn,
+  onBadgeModeChange,
 }: PopupViewProps) {
   return (
     <main className="pacer-popup">
@@ -136,6 +174,8 @@ export function PopupView({
       {!snapshot && !signedOut ? (
         <p className="pacer-empty">No usage data yet. Refresh to fetch.</p>
       ) : null}
+
+      <BadgeModeControl badgeMode={badgeMode} onBadgeModeChange={onBadgeModeChange} />
 
       <footer className="pacer-footer">
         {snapshot ? (

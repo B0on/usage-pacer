@@ -1,12 +1,29 @@
-// Usage Pacer service worker.
-// Alarm registration, fetch orchestration, and signed-out wiring land in P0-6.
+import {
+  createDefaultDeps,
+  handleBackgroundMessage,
+  refreshAndApply,
+  registerRefreshAlarm,
+} from "./handlers";
+import { REFRESH_ALARM_NAME } from "./messages";
 
-import { applyToolbar } from "../toolbar/apply";
-
-export { applyToolbar };
+const deps = createDefaultDeps();
 
 chrome.runtime.onInstalled.addListener(() => {
-  // P0-6: alarm + initial fetch → applyToolbar
+  registerRefreshAlarm(chrome.alarms);
+  void refreshAndApply(deps);
 });
 
-export {};
+chrome.runtime.onStartup.addListener(() => {
+  void refreshAndApply(deps);
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === REFRESH_ALARM_NAME) {
+    void refreshAndApply(deps);
+  }
+});
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  void handleBackgroundMessage(message, deps).then(sendResponse);
+  return true;
+});
