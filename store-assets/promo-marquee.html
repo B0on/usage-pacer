@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1400,height=560">
+  <title>Usage Pacer marquee promo tile</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, "Avenir Next", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      width: 1400px;
+      height: 560px;
+      overflow: hidden;
+      color: #f4f4f0;
+      background: #070908;
+    }
+    .tile {
+      position: relative;
+      width: 1400px;
+      height: 560px;
+      overflow: hidden;
+      padding: 84px 100px;
+      background:
+        radial-gradient(circle at 78% 24%, rgba(53, 155, 75, .28), transparent 29%),
+        radial-gradient(circle at 18% 80%, rgba(30, 74, 41, .26), transparent 33%),
+        linear-gradient(135deg, #0a110d, #070908 64%);
+    }
+    .eyebrow {
+      color: #63c271;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+    h1 {
+      width: 500px;
+      margin: 26px 0 18px;
+      font-size: 69px;
+      line-height: .95;
+      letter-spacing: -.06em;
+    }
+    .lede {
+      width: 380px;
+      margin: 0;
+      color: #a8ada8;
+      font-size: 20px;
+      line-height: 1.42;
+    }
+    .signal {
+      position: absolute;
+      top: 69px;
+      right: 95px;
+      width: 525px;
+      padding: 26px;
+      border: 1px solid #354339;
+      border-radius: 28px;
+      background: rgba(16, 21, 18, .95);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, .44);
+    }
+    .pills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .pill {
+      min-height: 118px;
+      padding: 19px;
+      border-radius: 17px;
+    }
+    .pill.elapsed { color: #0b0b0b; background: #3d9a4a; }
+    .pill.used { background: #5a6b3a; }
+    .label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      opacity: .72;
+      text-transform: uppercase;
+    }
+    .value {
+      display: block;
+      margin-top: 9px;
+      font-size: 47px;
+      font-weight: 800;
+      letter-spacing: -.06em;
+    }
+    .pace {
+      margin: 20px 3px 0;
+      color: #63c271;
+      font-size: 17px;
+      font-weight: 750;
+    }
+    .meta {
+      margin: 17px 3px 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .meta span {
+      display: block;
+      margin-top: 6px;
+      color: #909992;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .forecast {
+      margin-top: 19px;
+      padding: 13px 15px;
+      border-left: 3px solid #3d9a4a;
+      color: #d1d8d1;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .footer {
+      position: absolute;
+      left: 100px;
+      bottom: 63px;
+      color: #6f7a71;
+      font-size: 14px;
+      letter-spacing: .02em;
+    }
+    .footer strong { color: #9bab9d; }
+    .ring {
+      position: absolute;
+      left: 440px;
+      bottom: -250px;
+      width: 500px;
+      height: 500px;
+      border: 27px solid #1c261e;
+      border-right-color: #3d9a4a;
+      border-top-color: #3d9a4a;
+      border-radius: 50%;
+      opacity: .27;
+      transform: rotate(24deg);
+    }
+  </style>
+</head>
+<body>
+  <main class="tile">
+    <div class="eyebrow">Usage Pacer · for Cursor</div>
+    <h1>Know if your usage will last.</h1>
+    <p class="lede">Compare time elapsed with Cursor usage before you run out.</p>
+    <div class="signal">
+      <div class="pills">
+        <div class="pill elapsed"><span class="label">Elapsed</span><span class="value">92.4%</span></div>
+        <div class="pill used"><span class="label">Used</span><span class="value">66%</span></div>
+      </div>
+      <div class="pace">Behind −26.4pt · healthy pace</div>
+      <div class="meta">Pro <span>Resets on 18 Aug · 4 days left</span></div>
+      <div class="forecast">At this pace, lasts through reset.</div>
+    </div>
+    <div class="ring"></div>
+    <div class="footer"><strong>Local-only</strong> · no analytics</div>
+  </main>
+</body>
+</html>

@@ -29,7 +29,7 @@ Type: geometric sans, tabular numbers, bold on pills. No default system card gri
 5. **Footer** — relative last-synced + Refresh. Sign-in CTA when cookie missing.
 6. **Settings** — Badge (Remaining / Delta / Used) and Sync (5 min / 15 min / Manual). Same segmented control.
 
-Popup width ~320px. Padding uneven on purpose (more below pills than above). Hover on Refresh only.
+Popup width ~320px. Padding uneven on purpose (more below pills than above). Hover states on Refresh and settings.
 
 ## Toolbar
 

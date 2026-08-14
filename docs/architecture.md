@@ -21,7 +21,7 @@ flowchart LR
   subgraph chrome [Chrome]
     SW[Service worker]
     Popup[Popup React]
-    Alarm[chrome.alarms 15m]
+    Alarm[chrome.alarms]
     Cookies[chrome.cookies]
     Store[chrome.storage.local]
   end

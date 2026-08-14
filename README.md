@@ -19,5 +19,4 @@ npm run typecheck # tsc --noEmit (strict)
 Load the unpacked extension: run `npm run build`, then in `chrome://extensions`
 enable Developer mode and choose **Load unpacked** → `dist/`.
 
-Status: **Phase 0 MVP** is complete. Remaining ideas (store listing, history
-chart, notifications) are listed in [docs/todo.md](docs/todo.md).
+Status: **Phase 0 MVP** is complete. Store listing files live in [store-assets/](store-assets/). Remaining ideas (history chart, notifications) are in [docs/todo.md](docs/todo.md).

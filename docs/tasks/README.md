@@ -1,7 +1,7 @@
 # Task specs
 
-Board: [../todo.md](../todo.md). Phase 0: [phase-0.md](phase-0.md).
+Board: [../todo.md](../todo.md).
 
-Implement **one** ID with the **task-implement** skill (`next task` or e.g. `P0-1`).
+Phase 0 MVP is complete. Historical specs: [phase-0.md](phase-0.md).
 
-Do not start a task whose `_deps:` are still open.
+Remaining ideas live under **Later** in the board. Implement those only when the user asks.

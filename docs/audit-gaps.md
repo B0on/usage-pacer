@@ -22,8 +22,8 @@ None blocking implementation.
 
 ## Minor / deferred
 
-| Item | Phase |
+| Item | Status |
 |------|--------|
-| Chrome Web Store listing copy | After MVP |
+| Chrome Web Store listing copy | Shipped in [store-assets/](../store-assets/) |
+| `www.cursor.com` vs `cursor.com` cookie host | Implemented: look up both URLs |
 | Icon brand mark inside the ring | Optional later; MVP is ring-only |
-| `www.cursor.com` vs `cursor.com` cookie host | Implementer should get cookie for both URLs if the first is null |

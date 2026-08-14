@@ -62,15 +62,15 @@ Spec refs for every task: [brief.md](../brief.md), [architecture.md](../architec
 - **Spec refs:** [brief.md](../brief.md) (Popup), [design-system.md](../design-system.md)
 - **Files:** `src/popup/App.tsx`, styles, presentational components as needed
 - **Steps:**
-  1. Left pill used %, right pill elapsed (one decimal). Pace label, reset date (local), days left, forecast copy, Included/Bonus bars, API bar if needed, on-demand footnote, footer + Refresh.
+  1. Left pill elapsed (one decimal), right pill used (one decimal). Pace label, reset date (local), days left, forecast copy, Cursor Models / Other Models bars, on-demand footnote, footer + Refresh.
   2. Signed-out CTA opens `https://cursor.com`.
   3. English copy only.
-- **Acceptance:** Fixture render shows 66.1% vs 92.4, behind-pace label with one decimal, no template card grid. API bar hidden when `apiPercentUsed === 0`.
+- **Acceptance:** Fixture render shows 66.1% vs 92.4, behind-pace label with one decimal, no template card grid. Other Models bar still shows `0.0%` when unused.
 - **Tests:** Render popup with fixture (Vitest + React Testing Library): pills text, forecast, sign-in state.
 
 ### P0-6 — Alarm, settings, signed-out wiring
 
-- **Goal:** End-to-end loop: 15-minute refresh, badge mode setting, popup refresh, stale/sign-out rules applied to icon+badge+popup together.
+- **Goal:** End-to-end loop: configurable refresh alarm, badge mode, popup refresh, stale/sign-out rules applied to icon+badge+popup together.
 - **Depends on:** P0-4, P0-5
 - **Spec refs:** [architecture.md](../architecture.md) (Refresh, Error states, Cache)
 - **Files:** worker message API, popup settings control for badge mode, alarm registration on install

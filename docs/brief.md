@@ -38,7 +38,7 @@ This is a pacing tool, not a full AI-quota dashboard.
 | Timezone | Math in UTC instants. Display reset as a **local calendar date** (e.g. “Resets Aug 18”). |
 | On-demand | Remaining clamps at 0. Popup notes “On-demand ON” and amount used. Not a billing product. |
 | Signed-out | Cache younger than 24h → dim last-known badge. Else badge `—`. Popup prompts sign-in. |
-| Popup | Two pills (used % vs average %) like Cycle Counter, plus days left, forecast, Included + Bonus bars |
+| Popup | Two pills (elapsed % vs used %), days left, forecast, Cursor Models + Other Models bars, Badge + Sync settings |
 | Out of MVP | Daily history chart, threshold notifications |
 | Stack | TypeScript + Vite + React (popup), Manifest V3 |
 
@@ -84,10 +84,10 @@ Compare `projectedEmptyDay` to `cycleEnd`:
 
 Chrome allows **one** badge string (about 2–4 characters) on the extension icon. Two numbers cannot sit side-by-side on the toolbar the way Cycle Counter’s pills do. Usage Pacer splits the two signals across **icon** and **badge**:
 
-| Channel | What it shows | Screenshot mapping |
-|---------|----------------|--------------------|
-| **Icon (always)** | Ring filled to `averagePct` (elapsed time → 100% at reset) | Right pill `92.4` — “how far through the cycle” |
-| **Badge (toggle)** | One number + pace color | Left pill `66.1%` or its inverse remaining |
+| Channel | What it shows | Popup mapping |
+|---------|----------------|----------------|
+| **Icon (always)** | Ring filled to `averagePct` (elapsed time → 100% at reset) | Elapsed pill `92.4` |
+| **Badge (toggle)** | One number + pace color | Used pill `66.1%` or remaining |
 
 Near reset, the ring is almost a full circle. That is the “subscription is about to renew, spend what’s left” cue — without needing a second badge.
 
@@ -149,7 +149,7 @@ UI copy is **English**.
 5. **Forecast:** “At this pace, empty on DATE (N days before reset)” or “At this pace, lasts through reset”.
 6. **Breakdown:** **Cursor Models** and **Other Models** usage bars (`autoPercentUsed` / `apiPercentUsed`), one decimal like the pills (e.g. `76.0%` / `0.0%`). Other Models footnote uses the plan’s included API floor (Pro $20, Pro+ $70, Ultra $400).
 7. **On-demand:** if `onDemand.enabled`, footnote “On-demand ON” and `onDemand.used` when `used > 0`. Remaining % still clamps at 0.
-8. Footer: last synced time + manual refresh. If not signed in to `cursor.com`, prompt to open Cursor login. Grey `—` (or dim last-known) on the badge as above.
+8. Footer: last synced time + Refresh. Settings: Badge (Remaining / Delta / Used) and Sync (5 min / 15 min / Manual). If not signed in to `cursor.com`, prompt to open Cursor login. Grey `—` (or dim last-known) on the badge as above.
 
 ## What “the badge %” represents
 
@@ -273,7 +273,6 @@ Background alarm: user setting **5 min** / **15 min** (default) / **Manual**. Po
 - Manual date pickers (Cycle Counter style)
 - Spend / on-demand dollar tracking as a billing product (popup may note on-demand state only)
 - Localized UI (English only)
-- Chrome Web Store listing copy (name is locked; listing prose is later)
 
 ## Open questions
 
@@ -293,9 +292,11 @@ Product lock (2026-08-13):
 - **Timezone** — fractional UTC days for math; local calendar date for display.
 - **On-demand display** — remaining clamps at 0; popup notes on-demand.
 - **Signed-out** — dim last-known if cache < 24h, else `—`.
-- **Popup bars** — Included + Bonus; API only if non-zero.
+- **Popup bars** — Cursor Models (`autoPercentUsed`) and Other Models (`apiPercentUsed`), one decimal.
 - **UI language** — English.
 - **Toolbar encoding** — Icon ring = `averagePct` (cycle progress). Badge = remaining / delta / used. Popup always shows both pills.
+- **Percents** — Popup always one decimal. Toolbar badge one decimal when the string fits in 4 characters.
+- **Background sync** — 5 min / 15 min (default) / Manual. Popup open and Refresh always fetch.
 
 ## References
 

@@ -6,7 +6,7 @@
 |-------|------|------|
 | Unit (required) | Vitest | `src/domain/*` pacing, color, forecast, parse of fixture JSON |
 | Unit | Vitest | cookie-absent / 401 mapping, cache stale vs fresh (mock `chrome`) |
-| Manual | Load unpacked | Icon ring, badge modes, popup pills, sign-out |
+| Manual | Load unpacked | Icon ring, badge modes, sync interval, popup pills, sign-out |
 
 No Playwright/e2e in MVP (Chrome-extension auth is session-bound). Coverage target: **domain + parse ≥ 80%**. UI may stay fixture-rendered without 80% of React.
 
