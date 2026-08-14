@@ -1,7 +1,21 @@
 :root {
   --bg: #0b0b0b;
-  --text-on-pill: #f4f4f0;
+  --pill-used: #5a6b3a;
   --pill-elapsed: #3d9a4a;
+  --text-on-pill: #f4f4f0;
+  --text-on-elapsed: #111111;
+  --pace-green: #2f9e44;
+  --pace-yellow: #c9a227;
+  --pace-red: #c44536;
+  --pace-grey: #6b6b6b;
+  --ring-track: #2a2a2a;
+  --ring-fill: #3d9a4a;
+  --text-muted: #9a9a9a;
+  --text-dim: #7a7a7a;
+  --bar-track: #1f1f1f;
+  --bar-fill: #4a5c32;
+  --bar-fill-api: #5c4a32;
+  --error: #c44536;
 }
 
 html,
@@ -13,34 +27,208 @@ body {
 .pacer-popup {
   width: 320px;
   box-sizing: border-box;
-  padding: 20px 18px 28px;
+  padding: 10px 18px 28px;
   background: var(--bg);
   color: var(--text-on-pill);
   font-family:
+    "Avenir Next",
+    "Segoe UI",
     system-ui,
     -apple-system,
-    "Segoe UI",
     Roboto,
     sans-serif;
   font-variant-numeric: tabular-nums;
 }
 
-.pacer-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+.pacer-pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
 }
 
-.pacer-subtitle {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: var(--pill-elapsed);
+.pacer-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border-radius: 14px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.pacer-pill--used {
+  background: var(--pill-used);
+  color: var(--text-on-pill);
+}
+
+.pacer-pill--elapsed {
+  background: var(--pill-elapsed);
+  color: var(--text-on-elapsed);
+}
+
+.pacer-pace {
+  margin: 12px 0 0;
+  font-size: 15px;
   font-weight: 600;
 }
 
-.pacer-status {
-  margin: 18px 0 0;
+.pacer-pace--green {
+  color: var(--pace-green);
+}
+
+.pacer-pace--yellow {
+  color: var(--pace-yellow);
+}
+
+.pacer-pace--red {
+  color: var(--pace-red);
+}
+
+.pacer-meta {
+  margin-top: 14px;
+}
+
+.pacer-meta__plan {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.pacer-meta__reset,
+.pacer-meta__days {
+  margin: 4px 0 0;
   font-size: 12px;
-  color: #9a9a9a;
+  color: var(--text-muted);
+}
+
+.pacer-forecast {
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-on-pill);
+}
+
+.pacer-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pacer-bar__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.pacer-bar__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pacer-bar__value {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.pacer-bar__track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bar-track);
+  overflow: hidden;
+}
+
+.pacer-bar__fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--bar-fill);
+}
+
+.pacer-bar__fill--api {
+  background: var(--bar-fill-api);
+}
+
+.pacer-ondemand {
+  margin: 12px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.pacer-signin {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ring-track);
+}
+
+.pacer-signin__text {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pacer-signin__cta {
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pill-elapsed);
+  color: var(--text-on-elapsed);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pacer-signin__cta:hover {
+  filter: brightness(1.08);
+}
+
+.pacer-error {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--error);
+}
+
+.pacer-empty {
+  margin: 16px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pacer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ring-track);
+}
+
+.pacer-footer__synced {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.pacer-footer__refresh {
+  padding: 6px 12px;
+  border: 1px solid var(--ring-track);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-on-pill);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pacer-footer__refresh:hover {
+  border-color: var(--text-muted);
+  background: var(--ring-track);
 }
