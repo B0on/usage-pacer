@@ -12,7 +12,7 @@ Master: [brief.md](brief.md) · Architecture: [architecture.md](architecture.md)
 ## Phase 0 — MVP
 
 - [x] **P0-1** Scaffold MV3 + Vite + React _deps: —_
-- [ ] **P0-2** Pacing domain _deps: P0-1_
+- [x] **P0-2** Pacing domain _deps: P0-1_
 - [ ] **P0-3** Fetch usage-summary + cache _deps: P0-1, P0-2_
 - [ ] **P0-4** Elapsed ring icon + badge _deps: P0-2, P0-3_
 - [ ] **P0-5** Popup two-pills UI _deps: P0-2, P0-3_
