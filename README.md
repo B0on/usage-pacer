@@ -4,4 +4,20 @@ Chrome extension (Manifest V3) that paces Cursor usage against the billing-cycle
 
 Specs: [docs/brief.md](docs/brief.md) · [docs/architecture.md](docs/architecture.md) · [docs/todo.md](docs/todo.md)
 
-Implementation has not started. First task is **P0-1** (scaffold).
+## Development
+
+Requires Node.js 22+ and npm.
+
+```
+npm install      # install dependencies
+npm run dev      # Vite dev server (HMR) for the popup + worker
+npm run build    # production build to dist/ (loadable unpacked extension)
+npm test         # Vitest unit tests
+npm run typecheck # tsc --noEmit (strict)
+```
+
+Load the unpacked extension: run `npm run build`, then in `chrome://extensions`
+enable Developer mode and choose **Load unpacked** → `dist/`.
+
+Status: **P0-1 scaffold** complete (MV3 + Vite 6 + React + TypeScript strict +
+Vitest). Remaining Phase 0 tasks are tracked in [docs/todo.md](docs/todo.md).
