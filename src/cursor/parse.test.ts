@@ -14,6 +14,7 @@ describe("parseUsageSummary", () => {
       totalPercentUsed: 66.10724637681159,
       onDemand: { enabled: false, used: 0 },
       breakdown: { included: 2000, bonus: 20807, total: 22807 },
+      autoPercentUsed: 76.02333333333333,
       apiPercentUsed: 0,
       membershipType: "pro",
       fetchedAt: NOW_MS,

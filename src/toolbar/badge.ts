@@ -10,7 +10,8 @@ export const PACE_BADGE_COLORS: Record<PaceColor, string> = {
 
 export const PACE_GREY = "#6b6b6b";
 
-export const STALE_BADGE_TEXT = "—";
+export const STALE_BADGE_TEXT = "-";
+export const BADGE_TEXT_COLOR = "#ffffff";
 
 export type BadgePresentation = {
   text: string;
@@ -43,11 +44,12 @@ export function resolveBadgePresentation(input: {
 
 export async function setToolbarBadge(
   presentation: BadgePresentation,
-  action: Pick<
-    typeof chrome.action,
-    "setBadgeText" | "setBadgeBackgroundColor"
-  > = chrome.action,
+  action: Pick<typeof chrome.action, "setBadgeText" | "setBadgeBackgroundColor"> &
+    Partial<Pick<typeof chrome.action, "setBadgeTextColor">> = chrome.action,
 ): Promise<void> {
   await action.setBadgeText({ text: presentation.text });
   await action.setBadgeBackgroundColor({ color: presentation.backgroundColor });
+  if (action.setBadgeTextColor) {
+    await action.setBadgeTextColor({ color: BADGE_TEXT_COLOR });
+  }
 }

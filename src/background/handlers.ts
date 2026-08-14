@@ -71,7 +71,8 @@ export async function applyCacheToToolbar(
 export async function refreshAndApply(deps: BackgroundDeps): Promise<PopupState> {
   const result = await deps.fetchUsageSummary();
   const cache = await applyFetchResult(result, deps.storage);
-  const signedOut = await detectSignedOut(deps.getCookie);
+  const cookieMissing = await detectSignedOut(deps.getCookie);
+  const signedOut = cookieMissing || result.kind === "signed_out";
   await applyCacheToToolbar(cache, signedOut, deps);
   return toPopupState(cache, signedOut, deps.nowMs());
 }

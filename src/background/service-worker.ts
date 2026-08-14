@@ -14,6 +14,7 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.runtime.onStartup.addListener(() => {
+  registerRefreshAlarm(chrome.alarms);
   void refreshAndApply(deps);
 });
 

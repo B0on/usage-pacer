@@ -7,8 +7,8 @@ Direction: **Cycle Counter sibling**, not a dashboard template. Dark field, two 
 | Token | Value | Use |
 |-------|--------|-----|
 | `--bg` | `#0b0b0b` | Popup background |
-| `--pill-used` | olive green `#5a6b3a` | Left pill (actual used %) |
-| `--pill-elapsed` | brighter green `#3d9a4a` | Right pill (elapsed / average %) |
+| `--pill-used` | olive green `#5a6b3a` | Right pill (actual used %) |
+| `--pill-elapsed` | brighter green `#3d9a4a` | Left pill (elapsed / average %) |
 | `--text-on-pill` | `#f4f4f0` | Left pill type |
 | `--text-on-elapsed` | `#111111` | Right pill type (matches screenshot) |
 | `--pace-green` | `#2f9e44` | Badge on/under pace |
@@ -22,10 +22,10 @@ Type: geometric sans, tabular numbers, bold on pills. No default system card gri
 
 ## Components
 
-1. **Pills row** — two rounded rects, used % left (`66%` with `%`), elapsed right (`92.4` no `%` required, one decimal). Same 0–100 scale.
+1. **Pills row** — two labeled rounded rects. Left: **Elapsed** (`92.4%`, one decimal). Right: **Used** (`66%`). Same 0–100 scale. Caption sits above the number inside each pill.
 2. **Pace label** — `Behind −26pt` / `Ahead +8pt` under the pills.
 3. **Meta** — plan name, `Resets on 18 Aug`, `N days left`, forecast sentence.
-4. **Bars** — Included / Bonus; API bar only if `apiPercentUsed !== 0`.
+4. **Bars** — **Cursor Models** (`autoPercentUsed`) and **Other Models** (`apiPercentUsed`), matching the Cursor “Included in {plan}” dashboard. Other Models hint is plan-specific (Pro $20 / Pro+ $70 / Ultra $400).
 5. **Footer** — relative last-synced + Refresh. Sign-in CTA when cookie missing.
 
 Popup width ~320px. Padding uneven on purpose (more below pills than above). Hover on Refresh only.

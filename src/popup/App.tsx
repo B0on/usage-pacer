@@ -5,27 +5,25 @@ import { sendBackgroundMessage } from "./messages";
 import { PopupView } from "./PopupView";
 
 const CURSOR_URL = "https://cursor.com";
+const USAGE_DASHBOARD_URL = "https://cursor.com/dashboard/usage";
 
-function openCursorSignIn(): void {
+function openUrl(url: string): void {
   if (typeof chrome !== "undefined" && chrome.tabs?.create) {
-    void chrome.tabs.create({ url: CURSOR_URL });
+    void chrome.tabs.create({ url });
     return;
   }
-  window.open(CURSOR_URL, "_blank", "noopener,noreferrer");
-}
-
-function applyPopupState(state: PopupState, setState: (state: PopupState) => void): void {
-  setState(state);
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 
 export function App() {
   const [state, setState] = useState<PopupState>({
     snapshot: null,
-    signedOut: true,
+    signedOut: false,
     lastError: null,
     badgeMode: "remaining",
   });
   const [nowMs, setNowMs] = useState(() => Date.now());
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,17 +32,19 @@ export function App() {
       try {
         const initial = await sendBackgroundMessage({ type: "getState" });
         if (!cancelled) {
-          applyPopupState(initial, setState);
+          setState(initial);
           setNowMs(Date.now());
+          setHydrated(true);
         }
 
         const refreshed = await sendBackgroundMessage({ type: "refresh" });
         if (!cancelled) {
-          applyPopupState(refreshed, setState);
+          setState(refreshed);
           setNowMs(Date.now());
         }
       } catch {
         if (!cancelled) {
+          setHydrated(true);
           setState((current) => ({
             ...current,
             lastError: current.lastError ?? "Could not reach the extension background",
@@ -62,7 +62,7 @@ export function App() {
     void (async () => {
       try {
         const refreshed = await sendBackgroundMessage({ type: "refresh" });
-        applyPopupState(refreshed, setState);
+        setState(refreshed);
         setNowMs(Date.now());
       } catch {
         setState((current) => ({
@@ -77,7 +77,7 @@ export function App() {
     void (async () => {
       try {
         const updated = await sendBackgroundMessage({ type: "setBadgeMode", mode });
-        applyPopupState(updated, setState);
+        setState(updated);
         setNowMs(Date.now());
       } catch {
         setState((current) => ({
@@ -95,8 +95,10 @@ export function App() {
       lastError={state.lastError}
       badgeMode={state.badgeMode}
       nowMs={nowMs}
+      hydrated={hydrated}
       onRefresh={handleRefresh}
-      onSignIn={openCursorSignIn}
+      onSignIn={() => openUrl(CURSOR_URL)}
+      onOpenUsage={() => openUrl(USAGE_DASHBOARD_URL)}
       onBadgeModeChange={handleBadgeModeChange}
     />
   );

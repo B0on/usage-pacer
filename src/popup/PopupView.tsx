@@ -1,10 +1,13 @@
 import { computePacing } from "../domain/pacing";
 import type { BadgeMode, UsageSnapshot } from "../domain/types";
 import {
-  capitalizeMembershipType,
   formatDaysLeft,
   formatForecastCopy,
+  formatIncludedHeading,
+  formatModelPoolPercent,
+  formatOtherModelsHint,
   formatPaceLabel,
+  formatPlanLabel,
   formatRelativeSync,
   paceColorClass,
 } from "./format";
@@ -23,29 +26,38 @@ export type PopupViewProps = {
   nowMs: number;
   onRefresh?: () => void;
   onSignIn?: () => void;
+  onOpenUsage?: () => void;
   onBadgeModeChange?: (mode: BadgeMode) => void;
+  hydrated?: boolean;
 };
 
-function BreakdownBar({
+function ModelPoolBar({
   label,
-  value,
-  total,
+  percentUsed,
+  hint,
+  fillClass,
 }: {
   label: string;
-  value: number;
-  total: number;
+  percentUsed: number;
+  hint?: string;
+  fillClass: string;
 }) {
-  const widthPct = total > 0 ? Math.min(100, (value / total) * 100) : 0;
+  const widthPct = Math.min(100, Math.max(0, percentUsed));
+  const display = formatModelPoolPercent(percentUsed);
 
   return (
     <div className="pacer-bar">
       <div className="pacer-bar__header">
         <span className="pacer-bar__label">{label}</span>
-        <span className="pacer-bar__value">{value.toLocaleString()}</span>
+        <span className="pacer-bar__value">{display}</span>
       </div>
       <div className="pacer-bar__track">
-        <div className="pacer-bar__fill" style={{ width: `${widthPct}%` }} />
+        <div
+          className={`pacer-bar__fill ${fillClass}`}
+          style={{ width: `${widthPct}%` }}
+        />
       </div>
+      {hint ? <p className="pacer-bar__hint">{hint}</p> : null}
     </div>
   );
 }
@@ -58,15 +70,20 @@ function UsageContent({
   nowMs: number;
 }) {
   const pacing = computePacing(snapshot, nowMs);
-  const { breakdown } = snapshot;
   const daysLeft = formatDaysLeft(pacing.daysLeft);
   const forecastCopy = formatForecastCopy(pacing.forecast, snapshot.billingCycleEnd);
 
   return (
     <>
-      <div className="pacer-pills" aria-label="Usage pacing">
-        <div className="pacer-pill pacer-pill--used">{pacing.usedPillDisplay}</div>
-        <div className="pacer-pill pacer-pill--elapsed">{pacing.elapsedPillDisplay}</div>
+      <div className="pacer-pills" aria-label="Usage versus time in this billing cycle">
+        <div className="pacer-pill pacer-pill--elapsed">
+          <span className="pacer-pill__label">Elapsed</span>
+          <span className="pacer-pill__value">{pacing.elapsedPillDisplay}%</span>
+        </div>
+        <div className="pacer-pill pacer-pill--used">
+          <span className="pacer-pill__label">Used</span>
+          <span className="pacer-pill__value">{pacing.usedPillDisplay}</span>
+        </div>
       </div>
 
       <p className={`pacer-pace ${paceColorClass(pacing.paceColor)}`}>
@@ -74,7 +91,7 @@ function UsageContent({
       </p>
 
       <div className="pacer-meta">
-        <p className="pacer-meta__plan">{capitalizeMembershipType(snapshot.membershipType)}</p>
+        <p className="pacer-meta__plan">{formatPlanLabel(snapshot.membershipType)}</p>
         <p className="pacer-meta__reset">Resets on {pacing.resetDateLocal}</p>
         <p className="pacer-meta__days">
           {daysLeft} day{daysLeft === 1 ? "" : "s"} left
@@ -83,28 +100,21 @@ function UsageContent({
 
       {forecastCopy ? <p className="pacer-forecast">{forecastCopy}</p> : null}
 
-      <div className="pacer-bars">
-        <BreakdownBar
-          label="Included"
-          value={breakdown.included}
-          total={breakdown.total}
+      <section className="pacer-bars" aria-label={formatIncludedHeading(snapshot.membershipType)}>
+        <p className="pacer-bars__heading">{formatIncludedHeading(snapshot.membershipType)}</p>
+        <ModelPoolBar
+          label="Cursor Models"
+          percentUsed={snapshot.autoPercentUsed}
+          hint="Includes Cursor Grok and Composer"
+          fillClass="pacer-bar__fill--cursor-models"
         />
-        <BreakdownBar label="Bonus" value={breakdown.bonus} total={breakdown.total} />
-        {snapshot.apiPercentUsed !== 0 ? (
-          <div className="pacer-bar">
-            <div className="pacer-bar__header">
-              <span className="pacer-bar__label">API</span>
-              <span className="pacer-bar__value">{snapshot.apiPercentUsed.toFixed(1)}%</span>
-            </div>
-            <div className="pacer-bar__track">
-              <div
-                className="pacer-bar__fill pacer-bar__fill--api"
-                style={{ width: `${Math.min(100, snapshot.apiPercentUsed)}%` }}
-              />
-            </div>
-          </div>
-        ) : null}
-      </div>
+        <ModelPoolBar
+          label="Other Models"
+          percentUsed={snapshot.apiPercentUsed}
+          hint={formatOtherModelsHint(snapshot.membershipType)}
+          fillClass="pacer-bar__fill--other-models"
+        />
+      </section>
 
       {snapshot.onDemand.enabled ? (
         <p className="pacer-ondemand">
@@ -154,11 +164,13 @@ export function PopupView({
   nowMs,
   onRefresh,
   onSignIn,
+  onOpenUsage,
   onBadgeModeChange,
+  hydrated = true,
 }: PopupViewProps) {
   return (
     <main className="pacer-popup">
-      {signedOut ? (
+      {hydrated && signedOut ? (
         <section className="pacer-signin" aria-label="Sign in">
           <p className="pacer-signin__text">Sign in to Cursor to sync your usage.</p>
           <button type="button" className="pacer-signin__cta" onClick={onSignIn}>
@@ -171,7 +183,7 @@ export function PopupView({
 
       {snapshot ? <UsageContent snapshot={snapshot} nowMs={nowMs} /> : null}
 
-      {!snapshot && !signedOut ? (
+      {hydrated && !snapshot && !signedOut ? (
         <p className="pacer-empty">No usage data yet. Refresh to fetch.</p>
       ) : null}
 
@@ -183,11 +195,20 @@ export function PopupView({
             Last synced {formatRelativeSync(snapshot.fetchedAt, nowMs)}
           </span>
         ) : (
-          <span className="pacer-footer__synced">Not synced yet</span>
+          <span className="pacer-footer__synced">
+            {hydrated ? "Not synced yet" : "Loading…"}
+          </span>
         )}
-        <button type="button" className="pacer-footer__refresh" onClick={onRefresh}>
-          Refresh
-        </button>
+        <div className="pacer-footer__actions">
+          {snapshot && !signedOut ? (
+            <button type="button" className="pacer-footer__link" onClick={onOpenUsage}>
+              Usage
+            </button>
+          ) : null}
+          <button type="button" className="pacer-footer__refresh" onClick={onRefresh}>
+            Refresh
+          </button>
+        </div>
       </footer>
     </main>
   );

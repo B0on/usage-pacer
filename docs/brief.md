@@ -140,12 +140,12 @@ Signed-out / stale:
 
 UI copy is **English**.
 
-1. **Header pills (Cycle Counter layout):** left = actual used % (`66%`), right = linear average / elapsed % (`92.4`). Same 0–100 scale. Left < right → surplus (spend before reset). Left > right → ahead (slow down).
+1. **Header pills (Cycle Counter layout):** left = **Elapsed** (linear average time through the cycle, e.g. `92.4%`), right = **Used** (`totalPercentUsed`, e.g. `66%`). Same 0–100 scale. Each pill has a short caption so the two numbers are not unlabeled. Used < Elapsed → surplus (spend before reset). Used > Elapsed → ahead (slow down).
 2. Plan label (`membershipType`), reset date in local time (“Resets on 18 Aug”).
 3. **Pace row:** `Ahead +4.5pt` / `Behind −4.5pt` (numeric delta; the pills already show the two %).
 4. **Days left** until reset (from fractional `daysLeft`, displayed as a whole number of days).
 5. **Forecast:** “At this pace, empty on DATE (N days before reset)” or “At this pace, lasts through reset”.
-6. **Breakdown:** separate bars for **Included** and **Bonus** (`breakdown.included` / `breakdown.bonus`). Show an **API** bar only when `apiPercentUsed != 0`.
+6. **Breakdown:** **Cursor Models** and **Other Models** usage bars (`autoPercentUsed` / `apiPercentUsed`), aligned with the Cursor dashboard “Included in {plan}” section. Other Models footnote uses the plan’s included API floor (Pro $20, Pro+ $70, Ultra $400).
 7. **On-demand:** if `onDemand.enabled`, footnote “On-demand ON” and `onDemand.used` when `used > 0`. Remaining % still clamps at 0.
 8. Footer: last synced time + manual refresh. If not signed in to `cursor.com`, prompt to open Cursor login. Grey `—` (or dim last-known) on the badge as above.
 

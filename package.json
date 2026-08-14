@@ -1,6 +1,6 @@
 {
   "name": "usage-pacer",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Chrome MV3 extension that paces Cursor usage against the billing-cycle reset date.",
   "private": true,
   "type": "module",

@@ -17,6 +17,7 @@ Master: [brief.md](brief.md) · Architecture: [architecture.md](architecture.md)
 - [x] **P0-4** Elapsed ring icon + badge _deps: P0-2, P0-3_
 - [x] **P0-5** Popup two-pills UI _deps: P0-2, P0-3_
 - [x] **P0-6** Alarm, settings, signed-out wiring _deps: P0-4, P0-5_
+- [x] Popup pool bars + pill labels + hardening (plan copy, 401, alarm, cache)
 
 ## After MVP (not scheduled)
 

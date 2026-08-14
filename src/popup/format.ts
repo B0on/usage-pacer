@@ -1,6 +1,60 @@
 import { formatResetDateLocal } from "../domain/pacing";
 import { MS_PER_DAY, type DepletionForecast, type PacingViewModel } from "../domain/types";
 
+/** Whole-number % to match Cursor dashboard model pool bars. */
+export function formatModelPoolPercent(percentUsed: number): string {
+  if (!Number.isFinite(percentUsed)) {
+    return "0%";
+  }
+  return `${Math.round(percentUsed)}%`;
+}
+
+function normalizeMembershipKey(membershipType: string): string {
+  return membershipType.trim().toLowerCase().replace(/[\s-]+/g, "_");
+}
+
+/** User-facing plan name (Pro, Pro+, Ultra). */
+export function formatPlanLabel(membershipType: string): string {
+  switch (normalizeMembershipKey(membershipType)) {
+    case "pro_plus":
+    case "proplus":
+    case "plus":
+      return "Pro+";
+    case "ultra":
+      return "Ultra";
+    case "hobby":
+    case "free":
+      return "Hobby";
+    case "pro":
+      return "Pro";
+    default:
+      return capitalizeMembershipType(membershipType);
+  }
+}
+
+export function formatIncludedHeading(membershipType: string): string {
+  return `Included in ${formatPlanLabel(membershipType)}`;
+}
+
+/**
+ * Minimum included Other Models API usage, from Cursor pricing.
+ * Unknown plans get a generic hint without a dollar figure.
+ */
+export function formatOtherModelsHint(membershipType: string): string {
+  switch (normalizeMembershipKey(membershipType)) {
+    case "pro":
+      return "Your plan includes at least $20 of API usage";
+    case "pro_plus":
+    case "proplus":
+    case "plus":
+      return "Your plan includes at least $70 of API usage";
+    case "ultra":
+      return "Your plan includes at least $400 of API usage";
+    default:
+      return "Additional usage beyond limits consumes on-demand spend";
+  }
+}
+
 export function capitalizeMembershipType(membershipType: string): string {
   if (membershipType.length === 0) {
     return membershipType;

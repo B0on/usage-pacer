@@ -26,13 +26,73 @@ function getStorage(
   return storage;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** Fill fields added after the first cache schema so old snapshots still render. */
+export function normalizeSnapshot(raw: unknown): UsageSnapshot | null {
+  if (!isRecord(raw)) {
+    return null;
+  }
+  if (typeof raw.billingCycleStart !== "string") {
+    return null;
+  }
+  if (typeof raw.billingCycleEnd !== "string") {
+    return null;
+  }
+  if (typeof raw.totalPercentUsed !== "number" || Number.isNaN(raw.totalPercentUsed)) {
+    return null;
+  }
+  if (typeof raw.apiPercentUsed !== "number" || Number.isNaN(raw.apiPercentUsed)) {
+    return null;
+  }
+  if (typeof raw.membershipType !== "string") {
+    return null;
+  }
+  if (typeof raw.fetchedAt !== "number" || Number.isNaN(raw.fetchedAt)) {
+    return null;
+  }
+
+  const autoPercentUsed =
+    typeof raw.autoPercentUsed === "number" && Number.isFinite(raw.autoPercentUsed)
+      ? raw.autoPercentUsed
+      : 0;
+
+  const onDemandRecord = isRecord(raw.onDemand) ? raw.onDemand : {};
+  const breakdownRecord = isRecord(raw.breakdown) ? raw.breakdown : {};
+
+  return {
+    billingCycleStart: raw.billingCycleStart,
+    billingCycleEnd: raw.billingCycleEnd,
+    totalPercentUsed: raw.totalPercentUsed,
+    autoPercentUsed,
+    onDemand: {
+      enabled: onDemandRecord.enabled === true,
+      used:
+        typeof onDemandRecord.used === "number" && Number.isFinite(onDemandRecord.used)
+          ? onDemandRecord.used
+          : 0,
+    },
+    breakdown: {
+      included:
+        typeof breakdownRecord.included === "number" ? breakdownRecord.included : 0,
+      bonus: typeof breakdownRecord.bonus === "number" ? breakdownRecord.bonus : 0,
+      total: typeof breakdownRecord.total === "number" ? breakdownRecord.total : 0,
+    },
+    apiPercentUsed: raw.apiPercentUsed,
+    membershipType: raw.membershipType,
+    fetchedAt: raw.fetchedAt,
+  };
+}
+
 export async function getCache(
   storage: StorageArea = chrome.storage.local,
 ): Promise<CacheState> {
   const area = getStorage(storage);
   const data = await area.get([SNAPSHOT_KEY, BADGE_MODE_KEY, LAST_ERROR_KEY]);
 
-  const snapshot = (data[SNAPSHOT_KEY] as UsageSnapshot | undefined) ?? null;
+  const snapshot = normalizeSnapshot(data[SNAPSHOT_KEY]);
   const badgeMode =
     (data[BADGE_MODE_KEY] as BadgeMode | undefined) ?? DEFAULT_BADGE_MODE;
   const lastError = (data[LAST_ERROR_KEY] as string | null | undefined) ?? null;

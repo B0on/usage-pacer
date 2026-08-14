@@ -17,7 +17,8 @@ export type ApplyToolbarInput = {
 export type ChromeActionApi = Pick<
   typeof chrome.action,
   "setIcon" | "setBadgeText" | "setBadgeBackgroundColor"
->;
+> &
+  Partial<Pick<typeof chrome.action, "setBadgeTextColor">>;
 
 /** Compute pacing from cache and paint toolbar icon + badge. */
 export async function applyToolbar(
@@ -30,11 +31,21 @@ export async function applyToolbar(
   const stale = isSignedOutCacheStale(signedOut, fetchedAt, nowMs);
   const usable = hasUsableSnapshot(snapshot, signedOut, nowMs);
 
-  const viewModel =
-    usable && snapshot ? computePacing(snapshot, nowMs) : null;
+  let viewModel = null;
+  if (usable && snapshot) {
+    try {
+      viewModel = computePacing(snapshot, nowMs);
+    } catch {
+      viewModel = null;
+    }
+  }
   const averagePct = viewModel?.averagePct ?? 0;
 
-  await setElapsedRingIcon(averagePct, { showFill: usable }, action);
+  try {
+    await setElapsedRingIcon(averagePct, { showFill: Boolean(viewModel) }, action);
+  } catch {
+    // Keep going so a canvas failure cannot block the badge.
+  }
 
   const badge = resolveBadgePresentation({
     viewModel,

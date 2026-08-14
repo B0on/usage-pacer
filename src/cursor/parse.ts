@@ -70,6 +70,7 @@ export function parseUsageSummary(payload: unknown, nowMs: number): UsageSnapsho
   }
 
   const totalPercentUsed = readNumber(plan, "totalPercentUsed");
+  const autoPercentUsed = readNumber(plan, "autoPercentUsed");
   const apiPercentUsed = readNumber(plan, "apiPercentUsed");
 
   const breakdownRecord = plan.breakdown;
@@ -95,6 +96,7 @@ export function parseUsageSummary(payload: unknown, nowMs: number): UsageSnapsho
       bonus: readNumber(breakdownRecord, "bonus"),
       total: readNumber(breakdownRecord, "total"),
     },
+    autoPercentUsed,
     apiPercentUsed,
     membershipType,
     fetchedAt: nowMs,

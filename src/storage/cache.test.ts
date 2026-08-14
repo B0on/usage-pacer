@@ -103,4 +103,16 @@ describe("cache", () => {
     expect(state.snapshot).toEqual(snapshot);
     expect(state.lastError).toBeNull();
   });
+
+  it("defaults missing autoPercentUsed on legacy cached snapshots", async () => {
+    const snapshot = parseUsageSummary(fixture, NOW_MS);
+    const legacy = { ...snapshot } as Record<string, unknown>;
+    delete legacy.autoPercentUsed;
+    const storage = createMockStorage({ snapshot: legacy });
+
+    const state = await getCache(storage);
+
+    expect(state.snapshot?.autoPercentUsed).toBe(0);
+    expect(state.snapshot?.totalPercentUsed).toBe(snapshot.totalPercentUsed);
+  });
 });

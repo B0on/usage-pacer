@@ -26,6 +26,7 @@ function makeSnapshot(overrides: Partial<UsageSnapshot> = {}): UsageSnapshot {
     totalPercentUsed: 66.107,
     onDemand: { enabled: false, used: 0 },
     breakdown: { included: 2000, bonus: 20807, total: 22807 },
+    autoPercentUsed: 76.023,
     apiPercentUsed: 0,
     membershipType: "pro",
     fetchedAt: Date.parse("2026-08-14T10:00:00.000Z"),
@@ -182,7 +183,7 @@ describe("background message handlers", () => {
     );
   });
 
-  it("missing cookie with stale cache paints em dash via applyToolbar", async () => {
+  it("missing cookie with stale cache paints ASCII dash via applyToolbar", async () => {
     const fetchedAt = 1_000_000;
     const nowMs = fetchedAt + STALE_CACHE_MS;
     const deps = createDeps({
@@ -228,7 +229,7 @@ describe("background message handlers", () => {
 
     await handleSetBadgeMode("remaining", deps);
 
-    expect(deps.action?.setBadgeText).toHaveBeenCalledWith({ text: "—" });
+    expect(deps.action?.setBadgeText).toHaveBeenCalledWith({ text: "-" });
     expect(deps.action?.setBadgeBackgroundColor).toHaveBeenCalledWith({
       color: PACE_GREY,
     });
@@ -256,5 +257,27 @@ describe("background message handlers", () => {
 
     const refreshState = await handleBackgroundMessage({ type: "refresh" }, deps);
     expect(refreshState?.snapshot?.fetchedAt).toBe(9_999);
+  });
+
+  it("treats fetch signed_out as signedOut even when a cookie is still present", async () => {
+    const snapshot = makeSnapshot();
+    const deps = createDeps({
+      signedOut: false,
+      storageData: {
+        snapshot,
+        badgeMode: "remaining",
+        lastError: null,
+      },
+    });
+    deps.fetchUsageSummary.mockResolvedValue({ kind: "signed_out" });
+
+    const state = await refreshAndApply(deps);
+
+    expect(state.signedOut).toBe(true);
+    expect(state.snapshot).toEqual(snapshot);
+    expect(deps.applyToolbar).toHaveBeenCalledWith(
+      expect.objectContaining({ signedOut: true, snapshot }),
+      deps.action,
+    );
   });
 });

@@ -16,8 +16,11 @@ export type UsageSnapshot = {
   billingCycleStart: string;
   billingCycleEnd: string;
   totalPercentUsed: number;
+  /** Cursor Models pool (Grok, Composer) — display only, not used for pacing. */
+  autoPercentUsed: number;
   onDemand: OnDemand;
   breakdown: Breakdown;
+  /** Other Models pool (third-party / API usage). */
   apiPercentUsed: number;
   membershipType: string;
   fetchedAt: number;

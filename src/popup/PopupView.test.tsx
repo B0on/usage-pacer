@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { parseUsageSummary } from "../cursor/parse";
 import fixture from "../cursor/fixtures/usage-summary.json";
@@ -35,26 +35,71 @@ describe("PopupView", () => {
   it("renders screenshot fixture pills, pace label, and forecast", () => {
     renderFixture();
 
-    expect(screen.getByText("66%")).toBeInTheDocument();
-    expect(screen.getByText("92.4")).toBeInTheDocument();
+    const pills = screen.getByLabelText("Usage versus time in this billing cycle");
+    expect(within(pills).getByText("Elapsed")).toBeInTheDocument();
+    expect(within(pills).getByText("Used")).toBeInTheDocument();
+    expect(within(pills).getByText("92.4%")).toBeInTheDocument();
+    expect(within(pills).getByText("66%")).toBeInTheDocument();
     expect(screen.getByText("Behind −26pt")).toBeInTheDocument();
     expect(
       screen.getByText("At this pace, lasts through reset"),
     ).toBeInTheDocument();
   });
 
-  it("hides the API bar when apiPercentUsed is zero", () => {
+  it("renders Cursor Models and Other Models pool bars", () => {
     renderFixture();
 
-    expect(screen.queryByText("API")).not.toBeInTheDocument();
+    expect(screen.getByText("Included in Pro")).toBeInTheDocument();
+    expect(screen.getByText("Cursor Models")).toBeInTheDocument();
+    expect(screen.getByText("Other Models")).toBeInTheDocument();
+    expect(screen.getByText("76%")).toBeInTheDocument();
+    expect(screen.getByText("0%")).toBeInTheDocument();
+    expect(
+      screen.getByText("Includes Cursor Grok and Composer"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Your plan includes at least $20 of API usage"),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Usage" })).toBeInTheDocument();
+    expect(screen.queryByText("Included")).not.toBeInTheDocument();
+    expect(screen.queryByText("Bonus")).not.toBeInTheDocument();
   });
 
-  it("shows sign-in CTA when signed out", () => {
-    renderFixture({ signedOut: true });
+  it("uses Pro+ copy for Other Models when membership is pro_plus", () => {
+    const snapshot = parseUsageSummary(fixture, fixtureNowMs());
+    render(
+      <PopupView
+        snapshot={{ ...snapshot, membershipType: "pro_plus" }}
+        signedOut={false}
+        lastError={null}
+        badgeMode="remaining"
+        nowMs={fixtureNowMs()}
+      />,
+    );
+
+    expect(screen.getByText("Included in Pro+")).toBeInTheDocument();
+    expect(screen.getByText("Pro+")).toBeInTheDocument();
+    expect(
+      screen.getByText("Your plan includes at least $70 of API usage"),
+    ).toBeInTheDocument();
+  });
+
+  it("does not flash the sign-in CTA before hydration", () => {
+    render(
+      <PopupView
+        snapshot={null}
+        signedOut={true}
+        lastError={null}
+        badgeMode="remaining"
+        nowMs={Date.now()}
+        hydrated={false}
+      />,
+    );
 
     expect(
-      screen.getByRole("button", { name: "Open Cursor" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: "Open Cursor" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Loading…")).toBeInTheDocument();
   });
 
   it("renders badge mode control", () => {
@@ -81,7 +126,7 @@ describe("PopupView", () => {
     );
 
     expect(screen.queryByText("66%")).not.toBeInTheDocument();
-    expect(screen.queryByText("92.4")).not.toBeInTheDocument();
+    expect(screen.queryByText("92.4%")).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Open Cursor" }),
     ).toBeInTheDocument();

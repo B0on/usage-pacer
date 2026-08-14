@@ -18,6 +18,7 @@ function makeSnapshot(overrides: Partial<UsageSnapshot> = {}): UsageSnapshot {
     totalPercentUsed: 0,
     onDemand: { enabled: false, used: 0 },
     breakdown: { included: 2000, bonus: 20807, total: 22807 },
+    autoPercentUsed: 0,
     apiPercentUsed: 0,
     membershipType: "pro",
     fetchedAt: Date.parse(CYCLE_START),

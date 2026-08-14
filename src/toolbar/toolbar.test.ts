@@ -37,11 +37,12 @@ function makeSnapshot(overrides: Partial<UsageSnapshot> = {}): UsageSnapshot {
     totalPercentUsed: 66.107,
     onDemand: { enabled: false, used: 0 },
     breakdown: { included: 2000, bonus: 20807, total: 22807 },
+    autoPercentUsed: 76.023,
     apiPercentUsed: 0,
     membershipType: "pro",
     fetchedAt: Date.parse("2026-08-14T10:00:00.000Z"),
     ...overrides,
-  };
+  } as UsageSnapshot;
 }
 
 function nowAtElapsedFraction(fraction: number): number {
@@ -174,14 +175,14 @@ describe("resolveBadgePresentation", () => {
     expect(badge.backgroundColor).toBe(PACE_BADGE_COLORS.green);
   });
 
-  it("shows stale signed-out badge as em dash on grey", () => {
+  it("shows stale signed-out badge as ASCII dash on grey", () => {
     const badge = resolveBadgePresentation({
       viewModel: vm,
       signedOut: true,
       stale: true,
       badgeMode: "remaining",
     });
-    expect(badge.text).toBe("—");
+    expect(badge.text).toBe("-");
     expect(badge.backgroundColor).toBe(PACE_GREY);
   });
 
@@ -244,7 +245,7 @@ describe("applyToolbar", () => {
     });
   });
 
-  it("paints empty ring and em dash when signed out and stale", async () => {
+  it("paints empty ring and ASCII dash when signed out and stale", async () => {
     const setBadgeText = vi.fn().mockResolvedValue(undefined);
     const setBadgeBackgroundColor = vi.fn().mockResolvedValue(undefined);
     const action = {
@@ -267,7 +268,7 @@ describe("applyToolbar", () => {
     );
 
     expect(setElapsedRingIcon).toHaveBeenCalledWith(0, { showFill: false }, action);
-    expect(setBadgeText).toHaveBeenCalledWith({ text: "—" });
+    expect(setBadgeText).toHaveBeenCalledWith({ text: "-" });
     expect(setBadgeBackgroundColor).toHaveBeenCalledWith({ color: PACE_GREY });
   });
 
@@ -300,5 +301,28 @@ describe("applyToolbar", () => {
       { showFill: true },
       action,
     );
+  });
+
+  it("still sets the badge when ring drawing throws", async () => {
+    vi.mocked(setElapsedRingIcon).mockRejectedValueOnce(new Error("no canvas"));
+    const setBadgeText = vi.fn().mockResolvedValue(undefined);
+    const setBadgeBackgroundColor = vi.fn().mockResolvedValue(undefined);
+    const action = {
+      setIcon: vi.fn().mockResolvedValue(undefined),
+      setBadgeText,
+      setBadgeBackgroundColor,
+    };
+
+    await applyToolbar(
+      {
+        snapshot: makeSnapshot(),
+        signedOut: false,
+        badgeMode: "remaining",
+        nowMs: nowAtElapsedFraction(0.924),
+      },
+      action,
+    );
+
+    expect(setBadgeText).toHaveBeenCalledWith({ text: "34" });
   });
 });

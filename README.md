@@ -19,5 +19,5 @@ npm run typecheck # tsc --noEmit (strict)
 Load the unpacked extension: run `npm run build`, then in `chrome://extensions`
 enable Developer mode and choose **Load unpacked** → `dist/`.
 
-Status: **P0-1 scaffold** complete (MV3 + Vite 6 + React + TypeScript strict +
-Vitest). Remaining Phase 0 tasks are tracked in [docs/todo.md](docs/todo.md).
+Status: **Phase 0 MVP** is complete. Remaining ideas (store listing, history
+chart, notifications) are listed in [docs/todo.md](docs/todo.md).
