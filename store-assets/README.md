@@ -10,6 +10,14 @@
 - `usage-pacer-promo-small-440x280.png` — small promotional tile.
 - `usage-pacer-promo-marquee-1400x560.png` — marquee promotional tile.
 
+## Store upload
+
+1. `npm run package` — builds `dist/` and writes `usage-pacer-<version>.zip` at the repo root.
+2. [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole) → **Usage Pacer** → **Package** → upload the zip.
+3. Set version to match `package.json` (e.g. `0.1.1`). Publish when review passes.
+
+Listing: https://chromewebstore.google.com/detail/usage-pacer/pejlpkbmbjcpgkbkkjiphbgidldipdlk
+
 ## Source files
 
 - `store-preview.html` — source for the required screenshot.

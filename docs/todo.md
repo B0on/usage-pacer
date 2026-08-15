@@ -25,6 +25,7 @@ Master: [brief.md](brief.md) · Architecture: [architecture.md](architecture.md)
 - [x] Popup sync interval setting (5 min / 15 min / Manual)
 - [x] Store listing copy and assets (`store-assets/`)
 - [x] Public GitHub hygiene (MIT license, README, CI, privacy policy)
+- [x] Chrome Web Store 0.1.1 — restore Sync interval setting in published build
 
 ## Later
 

@@ -19,12 +19,18 @@ Data stays on-device. There is no Usage Pacer backend and no analytics.
 
 ## Install
 
-Chrome Web Store listing is not published yet. Load it unpacked:
+### Chrome Web Store
+
+[Usage Pacer on the Chrome Web Store](https://chromewebstore.google.com/detail/usage-pacer/pejlpkbmbjcpgkbkkjiphbgidldipdlk)
+
+Sign in at [cursor.com](https://cursor.com) in Chrome. The extension uses that existing session.
+
+### Load unpacked (development)
 
 1. Clone this repo and run `npm install` then `npm run build`.
 2. Open `chrome://extensions`, enable **Developer mode**.
 3. **Load unpacked** and choose the `dist/` folder.
-4. Sign in at [cursor.com](https://cursor.com) in Chrome. The extension uses that existing session.
+4. Sign in at [cursor.com](https://cursor.com) in Chrome.
 
 ## Privacy
 
@@ -44,6 +50,7 @@ Requires Node.js 22+ and npm.
 npm install
 npm run dev       # Vite HMR for popup + worker
 npm run build     # production build to dist/
+npm run package   # build + zip for Chrome Web Store upload
 npm test          # Vitest
 npm run typecheck
 ```
