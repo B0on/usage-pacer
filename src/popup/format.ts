@@ -9,6 +9,11 @@ export function formatModelPoolPercent(percentUsed: number): string {
   return `${roundToOneDecimal(percentUsed).toFixed(1)}%`;
 }
 
+/** Grok Bot weekly reset copy, e.g. "Resets Sep 10". */
+export function formatGrokBotReset(nextResetTimestampUtc: string): string {
+  return `Resets ${formatResetDateLocal(nextResetTimestampUtc)}`;
+}
+
 function normalizeMembershipKey(membershipType: string): string {
   return membershipType.trim().toLowerCase().replace(/[\s-]+/g, "_");
 }

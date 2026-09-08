@@ -4,6 +4,7 @@ import {
   type CookieGetter,
   type FetchResult,
 } from "../cursor/client";
+import { fetchSandUsageStatus, type SandFetchResult } from "../cursor/sand";
 import type { BadgeMode, RefreshInterval } from "../domain/types";
 import {
   applyFetchResult,
@@ -30,6 +31,7 @@ export type BackgroundDeps = {
   storage: StorageArea;
   getCookie: CookieGetter;
   fetchUsageSummary: () => Promise<FetchResult>;
+  fetchSandUsageStatus: () => Promise<SandFetchResult>;
   applyToolbar: typeof applyToolbar;
   nowMs: () => number;
   action?: ChromeActionApi;
@@ -75,8 +77,24 @@ export async function applyCacheToToolbar(
 }
 
 export async function refreshAndApply(deps: BackgroundDeps): Promise<PopupState> {
-  const result = await deps.fetchUsageSummary();
-  const cache = await applyFetchResult(result, deps.storage);
+  const [result, sandResult] = await Promise.all([
+    deps.fetchUsageSummary(),
+    deps.fetchSandUsageStatus(),
+  ]);
+
+  let cache: CacheState;
+  if (result.kind === "success" && sandResult.kind === "success") {
+    cache = await applyFetchResult(
+      {
+        kind: "success",
+        snapshot: { ...result.snapshot, grokBot: sandResult.grokBot },
+      },
+      deps.storage,
+    );
+  } else {
+    cache = await applyFetchResult(result, deps.storage);
+  }
+
   const cookieMissing = await detectSignedOut(deps.getCookie);
   const signedOut = cookieMissing || result.kind === "signed_out";
   await applyCacheToToolbar(cache, signedOut, deps);
@@ -166,6 +184,7 @@ export function createDefaultDeps(
     storage: chrome.storage.local,
     getCookie: chrome.cookies.get.bind(chrome.cookies),
     fetchUsageSummary: () => fetchUsageSummary(),
+    fetchSandUsageStatus: () => fetchSandUsageStatus(),
     applyToolbar,
     nowMs: () => Date.now(),
     alarms: chrome.alarms,

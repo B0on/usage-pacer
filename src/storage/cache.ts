@@ -69,6 +69,7 @@ export function normalizeSnapshot(raw: unknown): UsageSnapshot | null {
 
   const onDemandRecord = isRecord(raw.onDemand) ? raw.onDemand : {};
   const breakdownRecord = isRecord(raw.breakdown) ? raw.breakdown : {};
+  const grokBotRecord = isRecord(raw.grokBot) ? raw.grokBot : null;
 
   return {
     billingCycleStart: raw.billingCycleStart,
@@ -90,6 +91,19 @@ export function normalizeSnapshot(raw: unknown): UsageSnapshot | null {
     },
     apiPercentUsed: raw.apiPercentUsed,
     membershipType: raw.membershipType,
+    grokBot:
+      grokBotRecord !== null &&
+      typeof grokBotRecord.usagePercent === "number" &&
+      Number.isFinite(grokBotRecord.usagePercent) &&
+      typeof grokBotRecord.currentPeriodStart === "string" &&
+      typeof grokBotRecord.nextResetTimestampUtc === "string"
+        ? {
+            usagePercent: grokBotRecord.usagePercent,
+            currentPeriodStart: grokBotRecord.currentPeriodStart,
+            nextResetTimestampUtc: grokBotRecord.nextResetTimestampUtc,
+            hasNonZeroIncludedLimit: grokBotRecord.hasNonZeroIncludedLimit === true,
+          }
+        : null,
     fetchedAt: raw.fetchedAt,
   };
 }

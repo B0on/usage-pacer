@@ -40,7 +40,7 @@ This is a pacing tool, not a full AI-quota dashboard.
 | Timezone | Math in UTC instants. Display reset as a **local calendar date** (e.g. “Resets Aug 18”). |
 | On-demand | Remaining clamps at 0. Popup notes “On-demand ON” and amount used. Not a billing product. |
 | Signed-out | Cache younger than 24h → dim last-known badge. Else badge `—`. Popup prompts sign-in. |
-| Popup | Two pills (elapsed % vs used %), days left, forecast, Cursor Models + Other Models bars, Badge + Sync settings |
+| Popup | Two pills (elapsed % vs used %), days left, forecast, Cursor Models + Other Models bars, **Grok Bot weekly bar (best-effort)**, Badge + Sync settings |
 | Out of MVP | Daily history chart, threshold notifications |
 | Stack | TypeScript + Vite + React (popup), Manifest V3 |
 
@@ -151,7 +151,8 @@ UI copy is **English**.
 5. **Forecast:** “At this pace, empty on DATE (N days before reset)” or “At this pace, lasts through reset”.
 6. **Breakdown:** **Cursor Models** and **Other Models** usage bars (`autoPercentUsed` / `apiPercentUsed`), one decimal like the pills (e.g. `76.0%` / `0.0%`). Other Models footnote uses the plan’s included API floor (Pro $20, Pro+ $70, Ultra $400).
 7. **On-demand:** if `onDemand.enabled`, footnote “On-demand ON” and `onDemand.used` when `used > 0`. Remaining % still clamps at 0.
-8. Footer: last synced time + Refresh. Settings: Badge (Remaining / Delta / Used) and Sync (5 min / 15 min / Manual). If not signed in to `cursor.com`, prompt to open Cursor login. Grey `—` (or dim last-known) on the badge as above.
+8. **Grok Bot (best-effort):** if the sand fetch succeeded and `hasNonZeroIncludedLimit` is true, a third bar “Grok Bot — Weekly usage `N.N%` · Resets <date>”. The weekly window (`currentPeriodStart` / `nextResetTimestampUtc`) is display-only in this version; it does not affect the badge or the monthly pacing math. Fetch failure or a missing allowance hides the bar without touching the rest of the popup.
+9. Footer: last synced time + Refresh. Settings: Badge (Remaining / Delta / Used) and Sync (5 min / 15 min / Manual). If not signed in to `cursor.com`, prompt to open Cursor login. Grey `—` (or dim last-known) on the badge as above.
 
 ## What “the badge %” represents
 
@@ -208,13 +209,14 @@ This is unofficial, reverse-engineered from the Cursor web dashboard and existin
 
 The extension never stores the raw cookie in `storage`. It reads it at fetch time and sends it only to `https://cursor.com`.
 
-### Endpoints (verified live, 2026-08-13)
+### Endpoints (verified live, 2026-08-13; sand verified 2026-09-08)
 
-All verified with a logged-in `cursor.com` session. **Primary fetch target is `GET /api/usage-summary`** — one request returns the cycle window, all percentage fields, plan breakdown, and on-demand state.
+All verified with a logged-in `cursor.com` session. **Primary fetch target is `GET /api/usage-summary`** — one request returns the cycle window, all percentage fields, plan breakdown, and on-demand state. **Grok Bot weekly usage comes from a second, best-effort POST** (`/api/dashboard/get-sand-usage-status`); it is not part of `usage-summary`.
 
 | Purpose | Method | Path | Key fields returned |
 |---------|--------|------|---------------------|
 | **Cycle + usage (primary)** | GET | `/api/usage-summary` | `billingCycleStart`, `billingCycleEnd`, `membershipType`, `isUnlimited`, `individualUsage.plan{used,limit,remaining,breakdown{included,bonus,total},autoPercentUsed,apiPercentUsed,totalPercentUsed}`, `individualUsage.onDemand{enabled,used}` |
+| **Grok Bot weekly (best-effort)** | POST | `/api/dashboard/get-sand-usage-status` | `usagePercent`, `currentPeriodStart`, `nextResetTimestampUtc`, `hasNonZeroIncludedLimit` |
 | Identity | GET | `/api/auth/me` | `email`, `name`, `sub`, `id` |
 | Cycle start (legacy) | GET | `/api/usage?user=<id>` | `startOfMonth` |
 | Current-period % + model list | POST | `/api/dashboard/get-current-period-usage` | `billingCycleStart/End` (ms epoch), `planUsage{...same %s}`, `spendLimitUsage{limitType}`, `autoBucketModels[]` |
@@ -274,6 +276,7 @@ Background alarm: user setting **5 min** / **15 min** (default) / **Manual**. Po
 - Reading Cursor desktop app settings or local SQLite
 - Manual date pickers (Cycle Counter style)
 - Spend / on-demand dollar tracking as a billing product (popup may note on-demand state only)
+- Grok Bot weekly pacing (badge / forecast on the weekly window) — the weekly bar is display-only
 - Localized UI (English only)
 
 ## Open questions

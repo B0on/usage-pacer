@@ -3,6 +3,7 @@ import type { BadgeMode, RefreshInterval, UsageSnapshot } from "../domain/types"
 import {
   formatDaysLeft,
   formatForecastCopy,
+  formatGrokBotReset,
   formatIncludedHeading,
   formatModelPoolPercent,
   formatOtherModelsHint,
@@ -123,6 +124,18 @@ function UsageContent({
           fillClass="pacer-bar__fill--other-models"
         />
       </section>
+
+      {snapshot.grokBot && snapshot.grokBot.hasNonZeroIncludedLimit ? (
+        <section className="pacer-bars" aria-label="Grok Bot weekly usage">
+          <p className="pacer-bars__heading">Grok Bot</p>
+          <ModelPoolBar
+            label="Weekly usage"
+            percentUsed={snapshot.grokBot.usagePercent}
+            hint={formatGrokBotReset(snapshot.grokBot.nextResetTimestampUtc)}
+            fillClass="pacer-bar__fill--grok-bot"
+          />
+        </section>
+      ) : null}
 
       {snapshot.onDemand.enabled ? (
         <p className="pacer-ondemand">

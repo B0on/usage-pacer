@@ -25,7 +25,7 @@ Type: geometric sans, tabular numbers, bold on pills. No default system card gri
 1. **Pills row** — two labeled rounded rects. Left: **Elapsed** (`92.4%`, one decimal). Right: **Used** (`66.1%`, one decimal). Same 0–100 scale. Caption sits above the number inside each pill.
 2. **Pace label** — `Behind −26.3pt` / `Ahead +8.0pt` under the pills (one decimal, including `.0`).
 3. **Meta** — plan name, `Resets on 18 Aug`, `N days left`, forecast sentence.
-4. **Bars** — **Cursor Models** (`autoPercentUsed`) and **Other Models** (`apiPercentUsed`) with one decimal (e.g. `76.0%`, `0.0%`). Other Models hint is plan-specific (Pro $20 / Pro+ $70 / Ultra $400).
+4. **Bars** — **Cursor Models** (`autoPercentUsed`) and **Other Models** (`apiPercentUsed`) with one decimal (e.g. `76.0%`, `0.0%`). Other Models hint is plan-specific (Pro $20 / Pro+ $70 / Ultra $400). When the Grok Bot allowance is present, a third bar **Grok Bot — Weekly usage** (`usagePercent`, one decimal) with hint `Resets <date>`; fill color `--bar-fill-grok-bot` (lavender `#b48ce0`).
 5. **Footer** — relative last-synced + Refresh. Sign-in CTA when cookie missing.
 6. **Settings** — Badge (Remaining / Delta / Used) and Sync (5 min / 15 min / Manual). Same segmented control.
 

@@ -66,6 +66,57 @@ describe("PopupView", () => {
     expect(screen.queryByText("Bonus")).not.toBeInTheDocument();
   });
 
+  it("renders the Grok Bot weekly bar when the allowance is present", () => {
+    const snapshot = parseUsageSummary(fixture, fixtureNowMs());
+    render(
+      <PopupView
+        snapshot={{
+          ...snapshot,
+          grokBot: {
+            usagePercent: 12.5,
+            currentPeriodStart: "2026-09-05T18:22:04.315Z",
+            nextResetTimestampUtc: "2026-09-10T09:56:04.851Z",
+            hasNonZeroIncludedLimit: true,
+          },
+        }}
+        signedOut={false}
+        lastError={null}
+        badgeMode="remaining"
+        nowMs={fixtureNowMs()}
+        refreshInterval="15min"
+      />,
+    );
+
+    expect(screen.getByText("Grok Bot")).toBeInTheDocument();
+    expect(screen.getByText("Weekly usage")).toBeInTheDocument();
+    expect(screen.getByText("12.5%")).toBeInTheDocument();
+    expect(screen.getByText("Resets Sep 10")).toBeInTheDocument();
+  });
+
+  it("hides the Grok Bot bar when the allowance is missing or zero", () => {
+    const snapshot = parseUsageSummary(fixture, fixtureNowMs());
+    render(
+      <PopupView
+        snapshot={{
+          ...snapshot,
+          grokBot: {
+            usagePercent: 0,
+            currentPeriodStart: "2026-09-05T18:22:04.315Z",
+            nextResetTimestampUtc: "2026-09-10T09:56:04.851Z",
+            hasNonZeroIncludedLimit: false,
+          },
+        }}
+        signedOut={false}
+        lastError={null}
+        badgeMode="remaining"
+        nowMs={fixtureNowMs()}
+        refreshInterval="15min"
+      />,
+    );
+
+    expect(screen.queryByText("Weekly usage")).not.toBeInTheDocument();
+  });
+
   it("uses Pro+ copy for Other Models when membership is pro_plus", () => {
     const snapshot = parseUsageSummary(fixture, fixtureNowMs());
     render(
