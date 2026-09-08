@@ -5,6 +5,18 @@ export type OnDemand = {
   used: number;
 };
 
+/** Grok Bot weekly allowance from POST /api/dashboard/get-sand-usage-status. */
+export type GrokBotUsage = {
+  /** Weekly included usage, 0–100. */
+  usagePercent: number;
+  /** Start of the weekly window (ISO 8601 UTC). */
+  currentPeriodStart: string;
+  /** Weekly reset instant (ISO 8601 UTC). */
+  nextResetTimestampUtc: string;
+  /** False when the account has no Grok Bot allowance — hide the meter. */
+  hasNonZeroIncludedLimit: boolean;
+};
+
 export type Breakdown = {
   included: number;
   bonus: number;
@@ -23,6 +35,8 @@ export type UsageSnapshot = {
   /** Other Models pool (third-party / API usage). */
   apiPercentUsed: number;
   membershipType: string;
+  /** Grok Bot weekly allowance. Null when the fetch failed or is unavailable. */
+  grokBot: GrokBotUsage | null;
   fetchedAt: number;
 };
 

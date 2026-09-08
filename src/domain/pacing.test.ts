@@ -22,6 +22,7 @@ function makeSnapshot(overrides: Partial<UsageSnapshot> = {}): UsageSnapshot {
     autoPercentUsed: 0,
     apiPercentUsed: 0,
     membershipType: "pro",
+    grokBot: null,
     fetchedAt: Date.parse(CYCLE_START),
     ...overrides,
   };

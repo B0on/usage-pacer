@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import type { FetchResult } from "../cursor/client";
+import type { SandFetchResult } from "../cursor/sand";
 import type { UsageSnapshot } from "../domain/types";
 import { PACE_GREY } from "../toolbar/badge";
 import { STALE_CACHE_MS } from "../toolbar/stale";
@@ -28,6 +29,7 @@ function makeSnapshot(overrides: Partial<UsageSnapshot> = {}): UsageSnapshot {
     autoPercentUsed: 76.023,
     apiPercentUsed: 0,
     membershipType: "pro",
+    grokBot: null,
     fetchedAt: Date.parse("2026-08-14T10:00:00.000Z"),
     ...overrides,
   };
@@ -57,6 +59,7 @@ function createDeps(
   } = {},
 ): BackgroundDeps & {
   fetchUsageSummary: Mock<() => Promise<FetchResult>>;
+  fetchSandUsageStatus: Mock<() => Promise<SandFetchResult>>;
   applyToolbar: Mock<BackgroundDeps["applyToolbar"]>;
 } {
   const storage = createMemoryStorage(overrides.storageData);
@@ -65,6 +68,7 @@ function createDeps(
   const setIcon = vi.fn().mockResolvedValue(undefined);
   const applyToolbar = vi.fn<BackgroundDeps["applyToolbar"]>().mockResolvedValue(undefined);
   const fetchUsageSummary = vi.fn<() => Promise<FetchResult>>();
+  const fetchSandUsageStatus = vi.fn<() => Promise<SandFetchResult>>();
   const nowMs = vi.fn(() => Date.parse("2026-08-14T12:00:00.000Z"));
   const alarms = {
     create: vi.fn().mockResolvedValue(undefined),
@@ -75,6 +79,7 @@ function createDeps(
     storageData: _storageData,
     signedOut,
     fetchUsageSummary: _fetchOverride,
+    fetchSandUsageStatus: _sandOverride,
     applyToolbar: _applyOverride,
     ...rest
   } = overrides;
@@ -83,6 +88,7 @@ function createDeps(
     storage,
     getCookie: vi.fn(async () => (signedOut ? null : ({} as chrome.cookies.Cookie))),
     fetchUsageSummary,
+    fetchSandUsageStatus,
     applyToolbar,
     nowMs,
     action: { setIcon, setBadgeText, setBadgeBackgroundColor },
@@ -176,10 +182,12 @@ describe("background message handlers", () => {
       kind: "success",
       snapshot: newSnapshot,
     });
+    deps.fetchSandUsageStatus.mockResolvedValue({ kind: "unavailable" });
 
     const state = await refreshAndApply(deps);
 
     expect(deps.fetchUsageSummary).toHaveBeenCalledTimes(1);
+    expect(deps.fetchSandUsageStatus).toHaveBeenCalledTimes(1);
     expect(state.snapshot?.fetchedAt).toBe(newFetchedAt);
     expect(state.lastError).toBeNull();
     expect(deps.applyToolbar).toHaveBeenCalledWith(
@@ -190,6 +198,55 @@ describe("background message handlers", () => {
       }),
       deps.action,
     );
+  });
+
+  it("refresh merges Grok Bot usage into the snapshot when both fetches succeed", async () => {
+    const newFetchedAt = Date.parse("2026-08-14T12:34:56.000Z");
+    const deps = createDeps({
+      signedOut: false,
+      storageData: { snapshot: null, badgeMode: "remaining", lastError: null },
+    });
+
+    deps.fetchUsageSummary.mockResolvedValue({
+      kind: "success",
+      snapshot: makeSnapshot({ fetchedAt: newFetchedAt }),
+    });
+    deps.fetchSandUsageStatus.mockResolvedValue({
+      kind: "success",
+      grokBot: {
+        usagePercent: 12.5,
+        currentPeriodStart: "2026-08-12T00:00:00.000Z",
+        nextResetTimestampUtc: "2026-08-19T00:00:00.000Z",
+        hasNonZeroIncludedLimit: true,
+      },
+    });
+
+    const state = await refreshAndApply(deps);
+
+    expect(state.snapshot?.grokBot).toEqual({
+      usagePercent: 12.5,
+      currentPeriodStart: "2026-08-12T00:00:00.000Z",
+      nextResetTimestampUtc: "2026-08-19T00:00:00.000Z",
+      hasNonZeroIncludedLimit: true,
+    });
+  });
+
+  it("refresh keeps grokBot null when the sand fetch is unavailable", async () => {
+    const newFetchedAt = Date.parse("2026-08-14T12:34:56.000Z");
+    const deps = createDeps({
+      signedOut: false,
+      storageData: { snapshot: null, badgeMode: "remaining", lastError: null },
+    });
+
+    deps.fetchUsageSummary.mockResolvedValue({
+      kind: "success",
+      snapshot: makeSnapshot({ fetchedAt: newFetchedAt }),
+    });
+    deps.fetchSandUsageStatus.mockResolvedValue({ kind: "unavailable" });
+
+    const state = await refreshAndApply(deps);
+
+    expect(state.snapshot?.grokBot).toBeNull();
   });
 
   it("setBadgeMode persists mode, applies toolbar, and does not fetch", async () => {
@@ -317,6 +374,7 @@ describe("background message handlers", () => {
       kind: "success",
       snapshot: makeSnapshot({ fetchedAt: 9_999 }),
     });
+    deps.fetchSandUsageStatus.mockResolvedValue({ kind: "unavailable" });
 
     const modeState = await handleBackgroundMessage(
       { type: "setBadgeMode", mode: "used" },
@@ -345,6 +403,7 @@ describe("background message handlers", () => {
       },
     });
     deps.fetchUsageSummary.mockResolvedValue({ kind: "signed_out" });
+    deps.fetchSandUsageStatus.mockResolvedValue({ kind: "unavailable" });
 
     const state = await refreshAndApply(deps);
 

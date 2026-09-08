@@ -1,4 +1,4 @@
-import type { UsageSnapshot } from "../domain/types";
+import type { GrokBotUsage, UsageSnapshot } from "../domain/types";
 
 export class ParseError extends Error {
   constructor(message: string) {
@@ -99,6 +99,39 @@ export function parseUsageSummary(payload: unknown, nowMs: number): UsageSnapsho
     autoPercentUsed,
     apiPercentUsed,
     membershipType,
+    grokBot: null,
     fetchedAt: nowMs,
+  };
+}
+
+/**
+ * Parse a get-sand-usage-status payload into GrokBotUsage.
+ * Throws ParseError on malformed payloads; callers treat failures as
+ * "no Grok Bot data" (best-effort, never fatal).
+ */
+export function parseSandUsageStatus(payload: unknown): GrokBotUsage {
+  if (!isRecord(payload)) {
+    throw new ParseError("Expected a JSON object");
+  }
+
+  const usagePercent = readNumber(payload, "usagePercent");
+  const currentPeriodStart = parseIsoDate(
+    readString(payload, "currentPeriodStart"),
+    "currentPeriodStart",
+  );
+  const nextResetTimestampUtc = parseIsoDate(
+    readString(payload, "nextResetTimestampUtc"),
+    "nextResetTimestampUtc",
+  );
+  const hasNonZeroIncludedLimit = readBoolean(
+    payload,
+    "hasNonZeroIncludedLimit",
+  );
+
+  return {
+    usagePercent,
+    currentPeriodStart,
+    nextResetTimestampUtc,
+    hasNonZeroIncludedLimit,
   };
 }

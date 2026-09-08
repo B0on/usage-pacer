@@ -26,8 +26,10 @@ Master: [brief.md](brief.md) · Architecture: [architecture.md](architecture.md)
 - [x] Store listing copy and assets (`store-assets/`)
 - [x] Public GitHub hygiene (MIT license, README, CI, privacy policy)
 - [x] Chrome Web Store 0.1.1 — restore Sync interval setting in published build
+- [x] Grok Bot weekly usage bar (best-effort `get-sand-usage-status`, popup only)
 
 ## Later
 
 - [ ] Daily history chart
 - [ ] Threshold notifications
+- [ ] Grok Bot weekly pacing (badge / forecast on the weekly window)

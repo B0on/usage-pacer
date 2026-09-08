@@ -10,7 +10,7 @@ The extension reads the user’s existing `cursor.com` web session, pulls the cu
 
 - Toolbar **icon**: elapsed-time ring (`averagePct` → 100% at reset)
 - Toolbar **badge**: one number (remaining / delta / used) + pace color. One decimal when the text fits in 4 characters; integer otherwise.
-- **Popup**: Cycle Counter-style two pills (used % vs elapsed %) plus forecast
+- **Popup**: Cycle Counter-style two pills (used % vs elapsed %) plus forecast, and a best-effort **Grok Bot** weekly usage bar
 
 It does not scrape the Cursor desktop app.
 
@@ -26,10 +26,12 @@ flowchart LR
     Store[chrome.storage.local]
   end
   Cursor["cursor.com\nGET /api/usage-summary"]
+  Sand["cursor.com\nPOST /api/dashboard/get-sand-usage-status"]
   Alarm --> SW
   Popup -->|refresh / settings| SW
   SW -->|cookie present?| Cookies
   SW -->|credentials include| Cursor
+  SW -->|best-effort| Sand
   SW --> Store
   Popup --> Store
   SW -->|setIcon + setBadge| Toolbar[Toolbar]
@@ -40,7 +42,7 @@ flowchart LR
 | Layer | Path | Responsibility |
 |-------|------|----------------|
 | Domain | `src/domain/` | Pure pacing math and view-model. No `chrome.*`. |
-| Cursor client | `src/cursor/` | Cookie presence, `usage-summary` fetch, JSON parse. |
+| Cursor client | `src/cursor/` | Cookie presence, `usage-summary` fetch, `get-sand-usage-status` (best-effort), JSON parse. |
 | Cache | `src/storage/` | `chrome.storage.local` snapshot + settings. Never stores the cookie. |
 | Toolbar | `src/toolbar/` | Canvas ring icon + badge text/color. |
 | Background | `src/background/` | Alarm, orchestrate fetch → math → icon/badge. |
@@ -67,7 +69,7 @@ Draw 16×16 and 32×32 `ImageData` via `OffscreenCanvas` in the worker. Fallback
 
 | Key | Type | Notes |
 |-----|------|-------|
-| `snapshot` | `UsageSnapshot` | Last successful parse of `usage-summary` plus `fetchedAt` |
+| `snapshot` | `UsageSnapshot` | Last successful parse of `usage-summary` plus `fetchedAt`; `grokBot` block merged in when the sand fetch succeeds |
 | `badgeMode` | `"remaining" \| "delta" \| "used"` | Default `"remaining"` |
 | `refreshInterval` | `"5min" \| "15min" \| "manual"` | Default `"15min"`. Background alarm only. |
 | `lastError` | `string \| null` | Fetch/parse failure message for popup |
@@ -79,6 +81,7 @@ Draw 16×16 and 32×32 `ImageData` via `OffscreenCanvas` in the worker. Fallback
 - Background alarm: **5 minutes**, **15 minutes** (default), or **manual** (no alarm). Setting is `refreshInterval` in storage.
 - Always: popup open, manual Refresh button, extension install/startup.
 - Changing the interval updates the alarm immediately and does not fetch.
+- Each refresh runs `usage-summary` and `get-sand-usage-status` concurrently (`Promise.all`). The sand fetch is best-effort: any failure leaves `grokBot` null and never fails the monthly snapshot or toolbar update.
 
 ## Error states
 
@@ -92,4 +95,4 @@ Draw 16×16 and 32×32 `ImageData` via `OffscreenCanvas` in the worker. Fallback
 
 ## Out of scope (do not build)
 
-History chart, notifications, i18n, desktop-app scrape, storing cookies, calling extra Cursor dashboard POSTs in MVP (`usage-summary` is enough).
+History chart, notifications, i18n, desktop-app scrape, storing cookies, calling other Cursor dashboard POSTs (`get-sand-usage-status` is the only POST; `usage-summary` is the only required call).

@@ -117,6 +117,46 @@ describe("cache", () => {
     expect(state.snapshot?.totalPercentUsed).toBe(snapshot.totalPercentUsed);
   });
 
+  it("defaults grokBot to null on legacy cached snapshots", async () => {
+    const snapshot = parseUsageSummary(fixture, NOW_MS);
+    const legacy = { ...snapshot } as Record<string, unknown>;
+    delete legacy.grokBot;
+    const storage = createMockStorage({ snapshot: legacy });
+
+    const state = await getCache(storage);
+
+    expect(state.snapshot?.grokBot).toBeNull();
+  });
+
+  it("normalizes a stored grokBot block", async () => {
+    const snapshot = parseUsageSummary(fixture, NOW_MS);
+    const stored = {
+      ...snapshot,
+      grokBot: {
+        usagePercent: 12.5,
+        currentPeriodStart: "2026-09-05T18:22:04.315Z",
+        nextResetTimestampUtc: "2026-09-10T09:56:04.851Z",
+        hasNonZeroIncludedLimit: true,
+      },
+    };
+    const storage = createMockStorage({ snapshot: stored });
+
+    const state = await getCache(storage);
+
+    expect(state.snapshot?.grokBot).toEqual(stored.grokBot);
+  });
+
+  it("drops malformed grokBot blocks on cached snapshots", async () => {
+    const snapshot = parseUsageSummary(fixture, NOW_MS);
+    const storage = createMockStorage({
+      snapshot: { ...snapshot, grokBot: { usagePercent: "nope" } },
+    });
+
+    const state = await getCache(storage);
+
+    expect(state.snapshot?.grokBot).toBeNull();
+  });
+
   it("defaults refreshInterval to 15min and accepts stored values", async () => {
     const empty = createMockStorage();
     await expect(getCache(empty)).resolves.toMatchObject({

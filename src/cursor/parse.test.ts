@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import fixture from "./fixtures/usage-summary.json";
-import { ParseError, parseUsageSummary } from "./parse";
+import { ParseError, parseSandUsageStatus, parseUsageSummary } from "./parse";
 
 const NOW_MS = 1_725_000_000_000;
 
@@ -17,6 +17,7 @@ describe("parseUsageSummary", () => {
       autoPercentUsed: 76.02333333333333,
       apiPercentUsed: 0,
       membershipType: "pro",
+      grokBot: null,
       fetchedAt: NOW_MS,
     });
   });
@@ -68,5 +69,48 @@ describe("parseUsageSummary", () => {
         NOW_MS,
       ),
     ).toThrow(ParseError);
+  });
+});
+
+describe("parseSandUsageStatus", () => {
+  const sandFixture = {
+    currentPeriodStart: "2026-09-05T18:22:04.315Z",
+    nextResetTimestampUtc: "2026-09-10T09:56:04.851Z",
+    usagePercent: 0,
+    hasAvailableUsage: true,
+    hasNonZeroIncludedLimit: true,
+    upgradeRecommendation: {
+      cta: { label: "Upgrade to Pro+", url: { url: "https://cursor.com/x" } },
+      supportingText: "Get $500 of Grok Bot usage each week with Pro+",
+      kind: "upgrade-to-pro-plus-for-more-usage",
+    },
+    upgradeRecommendations: [],
+    onDemandSettings: { visible: true, eligible: true, dashboardUrl: "" },
+    grokPlanLabel: "Grok Bot Plan",
+  };
+
+  it("parses the live sand fixture into GrokBotUsage", () => {
+    expect(parseSandUsageStatus(sandFixture)).toEqual({
+      usagePercent: 0,
+      currentPeriodStart: "2026-09-05T18:22:04.315Z",
+      nextResetTimestampUtc: "2026-09-10T09:56:04.851Z",
+      hasNonZeroIncludedLimit: true,
+    });
+  });
+
+  it("rejects invalid reset timestamps", () => {
+    expect(() =>
+      parseSandUsageStatus({ ...sandFixture, nextResetTimestampUtc: "nope" }),
+    ).toThrow(ParseError);
+  });
+
+  it("rejects missing usagePercent", () => {
+    const { usagePercent: _usagePercent, ...rest } = sandFixture;
+    expect(() => parseSandUsageStatus(rest)).toThrow(ParseError);
+  });
+
+  it("rejects non-object payloads", () => {
+    expect(() => parseSandUsageStatus(null)).toThrow(ParseError);
+    expect(() => parseSandUsageStatus([])).toThrow(ParseError);
   });
 });

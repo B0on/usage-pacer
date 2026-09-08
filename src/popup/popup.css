@@ -15,6 +15,7 @@
   --bar-track: #1f1f1f;
   --bar-fill-cursor-models: #6eb5e8;
   --bar-fill-other-models: #8a8a8a;
+  --bar-fill-grok-bot: #b48ce0;
   --error: #c44536;
 }
 
@@ -179,6 +180,10 @@ body {
 
 .pacer-bar__fill--other-models {
   background: var(--bar-fill-other-models);
+}
+
+.pacer-bar__fill--grok-bot {
+  background: var(--bar-fill-grok-bot);
 }
 
 .pacer-bar__hint {
